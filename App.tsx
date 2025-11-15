@@ -12,6 +12,7 @@ import { TimelineView } from './components/TimelineView';
 import { EventDetailView } from './components/EventDetailView';
 import { JournalModal } from './components/JournalModal';
 import { Toast } from './components/Toast';
+import { MobileSidebar } from './components/MobileSidebar';
 
 type Content =
   | { type: 'initial' }
@@ -136,7 +137,7 @@ const App: React.FC = () => {
     switch (content.type) {
       case 'initial':
         return (
-          <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400 p-8">
+          <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400 p-8 min-h-[50vh]">
             <HistoryIcon className="w-24 h-24 mb-4" />
             <h2 className="text-2xl font-semibold">Üdv a Történelmi Tudástár+ felületén!</h2>
             <p className="max-w-md mt-2">
@@ -145,10 +146,10 @@ const App: React.FC = () => {
           </div>
         );
       case 'loading':
-        return <div className="flex items-center justify-center h-full"><LoadingSpinner message={content.message} /></div>;
+        return <div className="flex items-center justify-center h-full min-h-[50vh]"><LoadingSpinner message={content.message} /></div>;
       case 'error':
         return (
-          <div className="p-8 h-full flex items-center justify-center">
+          <div className="p-8 h-full flex items-center justify-center min-h-[50vh]">
             <div className="p-6 bg-red-100 dark:bg-red-900/50 border border-red-400 dark:border-red-700 rounded-lg shadow-lg text-red-800 dark:text-red-200">
               <h3 className="font-bold mb-2">Hiba!</h3>
               <p>{content.message}</p>
@@ -165,6 +166,17 @@ const App: React.FC = () => {
         return <EventDetailView key={content.data.id} eventDetail={content.data} onTermClick={handleSearch} onAddToJournal={handleAddToJournal} />;
     }
   };
+  
+  const sidePanelProps = {
+      onSearch: handleSearch,
+      onGenerateEssay: handleGenerateEssay,
+      onGenerateTimeline: handleGenerateTimeline,
+      onShowJournal: handleShowJournal,
+      journalItemCount: journal.length,
+      onExport: handleExport,
+      isActionDisabled: content.type === 'loading',
+      isExportDisabled: content.type !== 'article' && content.type !== 'essay' && content.type !== 'timeline'
+  };
 
   return (
     <div className="h-screen w-screen flex flex-col bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-200">
@@ -177,22 +189,28 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <div className="flex-grow flex overflow-hidden">
-        <main className="w-full lg:w-3/5 xl:w-2/3 h-full overflow-y-auto">
-          {renderMainContent()}
-        </main>
-        <aside className="hidden lg:block lg:w-2/5 xl:w-1/3 h-full bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 overflow-y-auto">
-          <SidePanel
-            onSearch={handleSearch}
-            onGenerateEssay={handleGenerateEssay}
-            onGenerateTimeline={handleGenerateTimeline}
-            onShowJournal={handleShowJournal}
-            journalItemCount={journal.length}
-            onExport={handleExport}
-            isActionDisabled={content.type === 'loading'}
-            isExportDisabled={content.type !== 'article' && content.type !== 'essay' && content.type !== 'timeline'}
-          />
-        </aside>
+      <div className="flex-grow overflow-y-auto">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+
+          <div className="lg:grid lg:grid-cols-[2fr,1fr] lg:gap-6">
+            <main className="mb-8 lg:mb-0">
+              {renderMainContent()}
+            </main>
+
+            <aside className="hidden lg:block">
+              <div className="sticky top-6">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+                  <SidePanel {...sidePanelProps} />
+                </div>
+              </div>
+            </aside>
+          </div>
+          
+          <section className="lg:hidden mt-6">
+             <MobileSidebar {...sidePanelProps} />
+          </section>
+
+        </div>
       </div>
 
       {isExportModalOpen && (content.type === 'article' || content.type === 'essay' || content.type === 'timeline') && (
