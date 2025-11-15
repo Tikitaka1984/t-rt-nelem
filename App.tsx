@@ -138,7 +138,7 @@ const App: React.FC = () => {
         return (
           <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400 p-8">
             <HistoryIcon className="w-24 h-24 mb-4" />
-            <h2 className="text-2xl font-semibold">Üdv a Végtelen Fogalomtárban!</h2>
+            <h2 className="text-2xl font-semibold">Üdv a Történelmi Tudástár+ felületén!</h2>
             <p className="max-w-md mt-2">
               Kezdje a tanulást egy fogalom beírásával a fenti keresőmezőbe, vagy használja a jobb oldali menü eszközeit.
             </p>
@@ -170,8 +170,8 @@ const App: React.FC = () => {
     <div className="h-screen w-screen flex flex-col bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-200">
       <header className="flex-shrink-0 z-20 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-sm p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">
-            Infinite Wiki - Történelem Érettségi Felkészítő
+          <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">
+            Történelmi Tudástár+
           </h1>
           <SearchBar onSearch={handleSearch} isLoading={content.type === 'loading'} />
         </div>

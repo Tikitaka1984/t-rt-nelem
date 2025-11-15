@@ -110,7 +110,7 @@ const eventDetailResponseSchema = {
 
 export const fetchConcept = async (term: string): Promise<Omit<Article, 'id'>> => {
   const systemInstruction = `
-    Te egy mesterséges intelligencia vagy, amely egy végtelenül bővíthető fogalomtárat ('Infinite Wiki') hoz létre magyar 12. évfolyamos diákok számára a történelemérettségi felkészüléshez. 
+    Te egy mesterséges intelligencia vagy, amely egy végtelenül bővíthető fogalomtárat ('Történelmi Tudástár+') hoz létre magyar 12. évfolyamos diákok számára a történelemérettségi felkészüléshez. 
     Minden válaszodnak pontosnak, közérthetőnek és szakmailag helyesnek kell lennie a középszintű és emelt szintű történelemérettségi követelményei szerint (NAT 2020).
     A válaszod stílusa legyen formális, objektív és tényszerű. Szigorúan tartsd be a megadott JSON sémát és formázási utasításokat. A teljes válasz magyar nyelven legyen.
   `;
