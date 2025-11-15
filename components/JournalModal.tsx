@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import { JournalEntry } from '../types';
 import { CloseIcon } from './icons/CloseIcon';
 import { CopyIcon } from './icons/CopyIcon';
@@ -10,6 +10,7 @@ interface JournalModalProps {
 
 export const JournalModal: React.FC<JournalModalProps> = ({ journal, onClose }) => {
   const [hasCopied, setHasCopied] = useState(false);
+  const titleId = useId();
 
   const getJournalText = () => {
     if (journal.length === 0) {
@@ -42,13 +43,16 @@ export const JournalModal: React.FC<JournalModalProps> = ({ journal, onClose }) 
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
         className="relative w-full max-w-2xl bg-white dark:bg-gray-800 rounded-lg shadow-xl m-4 animate-fade-in"
         onClick={e => e.stopPropagation()}
       >
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-semibold">Fogalomnapló</h3>
-            <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+            <h3 id={titleId} className="text-xl font-semibold">Fogalomnapló</h3>
+            <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" aria-label="Bezárás">
               <CloseIcon className="w-6 h-6" />
             </button>
           </div>

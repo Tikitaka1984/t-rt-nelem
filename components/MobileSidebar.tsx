@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { SidePanel } from './SidePanel';
 import { ChevronDownIcon } from './icons/ChevronDownIcon';
 
-// Props for MobileSidebar are the same as SidePanel
+// Props for MobileSidebar are a subset of SidePanel props, passed from App
 interface SidePanelProps {
   onSearch: (term: string) => void;
-  onGenerateEssay: (topic: string) => void;
+  onShowEssayGenerator: () => void;
   onGenerateTimeline: (topic: string) => void;
   onShowJournal: () => void;
   journalItemCount: number;

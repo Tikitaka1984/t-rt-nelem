@@ -1,0 +1,113 @@
+import React, { useState } from "react";
+import { generateEssay } from "../services/essayService";
+
+export default function EssayGenerator() {
+  const [topic, setTopic] = useState("");
+  const [level, setLevel] = useState("kozep");
+  const [style, setStyle] = useState("tomor");
+  const [mode, setMode] = useState("vazlat"); 
+  const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleGenerate = async () => {
+    if (!topic.trim()) return;
+    setLoading(true);
+    setResult("");
+    try {
+        const response = await generateEssay(topic, level, style, mode);
+        setResult(response);
+    } catch (error) {
+        setResult("Hiba történt az esszé generálása közben. Kérjük, próbálja újra később.");
+        console.error(error);
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  return (
+    <div className="rounded-2xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 p-8 shadow-xl space-y-6 animate-fade-in">
+      <h2 className="text-3xl font-bold">Érettségi Esszémotor (AI)</h2>
+
+      {/* Téma mező */}
+      <div>
+        <label className="text-sm opacity-80">Esszé témája</label>
+        <input
+          type="text"
+          placeholder="Pl.: A reformkor gazdasági és társadalmi folyamatai"
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          className="w-full px-4 py-3 rounded-xl mt-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
+        />
+      </div>
+
+      {/* Szint */}
+      <div>
+        <label className="text-sm opacity-80">Szint</label>
+        <select
+          value={level}
+          onChange={(e) => setLevel(e.target.value)}
+          className="w-full px-4 py-3 rounded-xl mt-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"
+        >
+          <option value="kozep">Középszint</option>
+          <option value="emelt">Emelt szint</option>
+        </select>
+      </div>
+
+      {/* Stílus */}
+      <div>
+        <label className="text-sm opacity-80">Esszé stílusa</label>
+        <select
+          value={style}
+          onChange={(e) => setStyle(e.target.value)}
+          className="w-full px-4 py-3 rounded-xl mt-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"
+        >
+          <option value="tomor">Tömör</option>
+          <option value="reszletes">Részletes</option>
+          <option value="elemzo">Elemző</option>
+        </select>
+      </div>
+
+      {/* Mód – Vázlat, Teljes esszé, Forráselemzés */}
+      <div>
+        <label className="text-sm opacity-80">Generálás módja</label>
+        <select
+          value={mode}
+          onChange={(e) => setMode(e.target.value)}
+          className="w-full px-4 py-3 rounded-xl mt-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"
+        >
+          <option value="vazlat">Esszévázlat</option>
+          <option value="teljes">Teljes esszé</option>
+          <option value="forras">Forráselemzés</option>
+        </select>
+      </div>
+
+      {/* Gomb */}
+      <button
+        onClick={handleGenerate}
+        disabled={loading || !topic.trim()}
+        className="w-full px-6 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 transition font-semibold text-white disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
+      >
+        {loading ? "Generálás..." : "Esszé készítése"}
+      </button>
+
+      {/* Eredmény */}
+      {result && (
+        <div className="mt-6 p-6 bg-gray-100 dark:bg-gray-900/50 rounded-2xl whitespace-pre-line">
+          <h3 className="text-xl font-bold mb-4 border-b pb-2 dark:border-gray-600">Generált eredmény:</h3>
+          <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none">
+            {result}
+          </div>
+        </div>
+      )}
+       <style>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.4s ease-out forwards;
+        }
+      `}</style>
+    </div>
+  );
+}

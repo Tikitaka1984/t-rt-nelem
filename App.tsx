@@ -1,25 +1,25 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Article, EventDetail, TimelineEvent, JournalEntry } from './types';
-import { fetchConcept, fetchEssay, fetchTimelineEvents, fetchEventDetail, fetchShortDefinition } from './services/geminiService';
+import { fetchConcept, fetchTimelineEvents, fetchEventDetail, fetchShortDefinition } from './services/geminiService';
 import { SearchBar } from './components/SearchBar';
 import { ArticleView } from './components/ArticleView';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { HistoryIcon } from './components/icons/HistoryIcon';
 import { SidePanel } from './components/SidePanel';
 import { ExportModal } from './components/ExportModal';
-import { EssayView } from './components/EssayView';
 import { TimelineView } from './components/TimelineView';
 import { EventDetailView } from './components/EventDetailView';
 import { JournalModal } from './components/JournalModal';
 import { Toast } from './components/Toast';
 import { MobileSidebar } from './components/MobileSidebar';
+import EssayGenerator from './components/EssayGenerator';
 
 type Content =
   | { type: 'initial' }
   | { type: 'loading', message: string }
   | { type: 'error', message: string }
   | { type: 'article', data: Article }
-  | { type: 'essay', data: { topic: string, text: string } }
+  | { type: 'essayGenerator' }
   | { type: 'timeline', data: { topic: string, events: TimelineEvent[] } }
   | { type: 'eventDetail', data: EventDetail };
 
@@ -59,17 +59,9 @@ const App: React.FC = () => {
     }
   }, [content]);
   
-  const handleGenerateEssay = useCallback(async (topic: string) => {
-    if (content.type === 'loading') return;
-    setContent({ type: 'loading', message: 'Esszé készítése...' });
-     try {
-      const result = await fetchEssay(topic);
-      setContent({ type: 'essay', data: { topic, text: result } });
-    } catch (err) {
-      setContent({ type: 'error', message: 'Hiba történt az esszé készítése közben. Kérjük, próbálja újra.' });
-      console.error(err);
-    }
-  }, [content]);
+  const handleShowEssayGenerator = useCallback(() => {
+    setContent({ type: 'essayGenerator' });
+  }, []);
 
   const handleGenerateTimeline = useCallback(async (topic: string) => {
     if (content.type === 'loading') return;
@@ -128,7 +120,7 @@ const App: React.FC = () => {
   };
 
   const handleExport = () => {
-    if (content.type === 'article' || content.type === 'essay' || content.type === 'timeline') {
+    if (content.type === 'article' || content.type === 'timeline') {
       setExportModalOpen(true);
     }
   };
@@ -158,8 +150,8 @@ const App: React.FC = () => {
         );
       case 'article':
         return <ArticleView key={content.data.id} article={content.data} onTermClick={handleSearch} onAddToJournal={handleAddToJournal} />;
-      case 'essay':
-        return <EssayView topic={content.data.topic} text={content.data.text} />;
+      case 'essayGenerator':
+        return <EssayGenerator />;
       case 'timeline':
         return <TimelineView topic={content.data.topic} events={content.data.events} onEventClick={handleEventClick} />;
       case 'eventDetail':
@@ -169,13 +161,13 @@ const App: React.FC = () => {
   
   const sidePanelProps = {
       onSearch: handleSearch,
-      onGenerateEssay: handleGenerateEssay,
+      onShowEssayGenerator: handleShowEssayGenerator,
       onGenerateTimeline: handleGenerateTimeline,
       onShowJournal: handleShowJournal,
       journalItemCount: journal.length,
       onExport: handleExport,
       isActionDisabled: content.type === 'loading',
-      isExportDisabled: content.type !== 'article' && content.type !== 'essay' && content.type !== 'timeline'
+      isExportDisabled: content.type !== 'article' && content.type !== 'timeline'
   };
 
   return (
@@ -192,19 +184,19 @@ const App: React.FC = () => {
       <div className="flex-grow overflow-y-auto">
         <div className="max-w-7xl mx-auto px-4 py-6">
 
-          <div className="lg:grid lg:grid-cols-[2fr,1fr] lg:gap-6">
-            <main className="mb-8 lg:mb-0">
+          <section className="lg:grid lg:grid-cols-[2fr,1fr] lg:gap-6">
+            <main className="lg:col-span-1 mb-8 lg:mb-0">
               {renderMainContent()}
             </main>
 
-            <aside className="hidden lg:block">
+            <aside className="hidden lg:block lg:col-span-1">
               <div className="sticky top-6">
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg">
                   <SidePanel {...sidePanelProps} />
                 </div>
               </div>
             </aside>
-          </div>
+          </section>
           
           <section className="lg:hidden mt-6">
              <MobileSidebar {...sidePanelProps} />
@@ -213,7 +205,7 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {isExportModalOpen && (content.type === 'article' || content.type === 'essay' || content.type === 'timeline') && (
+      {isExportModalOpen && (content.type === 'article' || content.type === 'timeline') && (
         <ExportModal content={content.data} type={content.type} onClose={() => setExportModalOpen(false)} />
       )}
       {isJournalModalOpen && (

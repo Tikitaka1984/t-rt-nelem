@@ -8,7 +8,7 @@ import { BookOpenIcon } from './icons/BookOpenIcon';
 
 interface SidePanelProps {
   onSearch: (term: string) => void;
-  onGenerateEssay: (topic: string) => void;
+  onShowEssayGenerator: () => void;
   onGenerateTimeline: (topic: string) => void;
   onShowJournal: () => void;
   journalItemCount: number;
@@ -19,7 +19,7 @@ interface SidePanelProps {
 
 export const SidePanel: React.FC<SidePanelProps> = ({ 
     onSearch, 
-    onGenerateEssay, 
+    onShowEssayGenerator, 
     onGenerateTimeline, 
     onShowJournal,
     journalItemCount,
@@ -28,7 +28,6 @@ export const SidePanel: React.FC<SidePanelProps> = ({
     isExportDisabled 
 }) => {
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
-  const [essayTopic, setEssayTopic] = useState<string>('');
   const [timelineTopic, setTimelineTopic] = useState<string>('');
 
   const handleTopicClick = (topic: string) => {
@@ -42,14 +41,6 @@ export const SidePanel: React.FC<SidePanelProps> = ({
     onSearch(randomConcept);
   };
   
-  const handleEssaySubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (essayTopic.trim() && !isActionDisabled) {
-      onGenerateEssay(essayTopic.trim());
-      setEssayTopic('');
-    }
-  }
-
   const handleTimelineSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (timelineTopic.trim() && !isActionDisabled) {
@@ -157,25 +148,16 @@ export const SidePanel: React.FC<SidePanelProps> = ({
       
       {/* Essay Generator Section */}
       <section>
-        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">Esszé-generáló modul</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Rövid, érettségi szintű esszét kérhetsz egy kiválasztott témáról vagy fogalomcsoportról.</p>
-        <form onSubmit={handleEssaySubmit} className="flex gap-2">
-          <input
-            type="text"
-            value={essayTopic}
-            onChange={(e) => setEssayTopic(e.target.value)}
-            placeholder="Téma, pl. 'dualizmus'"
+        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">Érettségi Esszémotor (AI)</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Indítsd el a mesterséges intelligencia alapú esszéíró modult, ahol részletes beállításokkal készíthetsz vázlatot, teljes esszét vagy forráselemzést.</p>
+        <button
+            onClick={onShowEssayGenerator}
             disabled={isActionDisabled}
-            className="flex-grow px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-sm"
-          />
-          <button
-            type="submit"
-            disabled={isActionDisabled || !essayTopic.trim()}
-            className="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-green-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
-             <FeatherIcon className="w-5 h-5" />
-          </button>
-        </form>
+            className="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-green-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+        >
+            <FeatherIcon className="w-5 h-5 mr-2" />
+            Esszémotor indítása
+        </button>
       </section>
 
       {/* Timeline Generator Section */}

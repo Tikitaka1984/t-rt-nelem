@@ -147,33 +147,6 @@ export const fetchConcept = async (term: string): Promise<Omit<Article, 'id'>> =
   }
 };
 
-export const fetchEssay = async (topic: string): Promise<string> => {
-  const systemInstruction = `
-    Te egy mesterséges intelligencia vagy, amely magyar 12. évfolyamos diákok számára ír rövid, érettségi szintű esszéket történelemből.
-    Az esszé legyen 10-15 mondat hosszú, formális, tárgyilagos és feleljen meg a magyar történelemérettségi követelményeinek.
-    A szerkezet: 2-3 mondat bevezetés (kontextus), 6-9 mondat tárgyalás (fő folyamatok, ok-okozat), 2-3 mondat befejezés (következmények, jelentőség).
-    Csak magát az esszé szövegét add vissza, mindenféle extra formázás, cím vagy bevezető nélkül.
-  `;
-  
-  const prompt = `Írj egy rövid, érettségi szintű esszét a következő témáról: "${topic}"`;
-
-  try {
-     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
-      contents: prompt,
-      config: {
-        systemInstruction,
-        temperature: 0.5,
-      },
-    });
-
-    return response.text.trim();
-  } catch (error) {
-    console.error("Error fetching essay from Gemini API:", error);
-    throw new Error("Nem sikerült létrehozni az esszét.");
-  }
-};
-
 export const fetchTimelineEvents = async (topic: string): Promise<TimelineEvent[]> => {
     const systemInstruction = `
     Te egy történész mesterséges intelligencia vagy, aki magyar 12. évfolyamos diákok számára készít idővonalakat.
