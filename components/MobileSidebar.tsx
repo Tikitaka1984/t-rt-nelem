@@ -19,7 +19,7 @@ export const MobileSidebar: React.FC<SidePanelProps> = (props) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="rounded-2xl bg-gray-900/80 text-white shadow-lg p-4 backdrop-blur-sm">
+    <div className="rounded-2xl bg-gray-900/80 dark:bg-[#0f3460]/90 text-white shadow-lg p-4 backdrop-blur-sm transition-colors duration-300">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex justify-between items-center text-left text-lg font-semibold"
@@ -32,7 +32,7 @@ export const MobileSidebar: React.FC<SidePanelProps> = (props) => {
       </button>
       <div
         className={`transition-all duration-300 ease-in-out overflow-hidden ${
-          isOpen ? 'max-h-[3000px] pt-4 mt-4 border-t border-gray-700' : 'max-h-0'
+          isOpen ? 'max-h-[3000px] pt-4 mt-4 border-t border-gray-700 dark:border-[#2a2a4e]' : 'max-h-0'
         }`}
       >
         {/* Force dark theme for SidePanel content to match the container */}

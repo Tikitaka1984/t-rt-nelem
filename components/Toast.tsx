@@ -7,7 +7,7 @@ interface ToastProps {
 export const Toast: React.FC<ToastProps> = ({ message }) => {
   return (
     <div className="fixed bottom-5 right-5 z-50">
-      <div className="px-6 py-3 bg-gray-800 text-white rounded-lg shadow-lg animate-toast-in-out">
+      <div className="px-6 py-3 bg-gray-800 dark:bg-[#0f3460] text-white rounded-lg shadow-lg animate-toast-in-out transition-colors duration-300">
         {message}
       </div>
        <style>{`

@@ -10,7 +10,7 @@ interface EventDetailViewProps {
 
 const DetailSection: React.FC<{ title: string; content: string }> = ({ title, content }) => (
   <div className="mb-6">
-    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">{title}</h3>
+    <h3 className="text-lg font-semibold text-gray-800 dark:text-[#e0e0e0] mb-2">{title}</h3>
     <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">{content}</p>
   </div>
 );
@@ -25,10 +25,10 @@ export const EventDetailView: React.FC<EventDetailViewProps> = ({ eventDetail, o
   }
 
   return (
-    <div className="h-full bg-gray-100 dark:bg-gray-900 p-4 sm:p-6 md:p-8 animate-fade-in">
-      <article className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 h-full flex flex-col">
+    <div className="h-full bg-gray-100 dark:bg-[#1a1a2e] p-4 sm:p-6 md:p-8 animate-fade-in transition-colors duration-300">
+      <article className="bg-white dark:bg-[#16213e] rounded-xl shadow-lg p-6 h-full flex flex-col transition-colors duration-300">
         <div className="flex-grow overflow-y-auto">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4 pb-2 border-b-2 border-amber-500">{eventDetail.title}</h2>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-[#e0e0e0] mb-4 pb-2 border-b-2 border-amber-500">{eventDetail.title}</h2>
           
           <div className="space-y-4">
             <DetailSection title="Előzmények" content={eventDetail.explanation.antecedents} />
@@ -37,8 +37,8 @@ export const EventDetailView: React.FC<EventDetailViewProps> = ({ eventDetail, o
             <DetailSection title="Következmények" content={eventDetail.explanation.consequences} />
           </div>
 
-          <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Kapcsolódó személyek</h3>
+          <div className="mt-8 pt-4 border-t border-gray-200 dark:border-[#2a2a4e]">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-[#e0e0e0] mb-3">Kapcsolódó személyek</h3>
             <ul className="space-y-4">
               {eventDetail.relatedPersons.map((person) => (
                 <li key={person.name}>
@@ -55,7 +55,7 @@ export const EventDetailView: React.FC<EventDetailViewProps> = ({ eventDetail, o
           </div>
           
           <div className="mt-6">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Kapcsolódó fogalmak az eseményhez</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-[#e0e0e0] mb-3">Kapcsolódó fogalmak az eseményhez</h3>
             <ul className="space-y-4">
               {eventDetail.relatedConcepts.map((concept) => (
                 <li key={concept.term}>
@@ -71,11 +71,11 @@ export const EventDetailView: React.FC<EventDetailViewProps> = ({ eventDetail, o
             </ul>
           </div>
         </div>
-         <div className="flex-shrink-0 pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
+         <div className="flex-shrink-0 pt-4 mt-4 border-t border-gray-200 dark:border-[#2a2a4e] transition-colors duration-300">
             <button
                 onClick={handleAddToJournalClick}
                 disabled={isAdding}
-                className="w-full flex items-center justify-center px-4 py-2 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-teal-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center px-4 py-2 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#16213e] focus:ring-teal-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
                 <BookPlusIcon className="w-5 h-5 mr-2" />
                 {isAdding ? 'Hozzáadás...' : 'Hozzáadás a fogalomnaplóhoz'}

@@ -11,10 +11,10 @@ export const AccordionItem: React.FC<AccordionItemProps> = ({ title, children })
   const panelId = useId();
 
   return (
-    <div className="border border-gray-200 dark:border-gray-700 rounded-lg">
+    <div className="border border-gray-200 dark:border-[#2a2a4e] rounded-lg transition-colors duration-300">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex justify-between items-center p-3 text-left font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        className="w-full flex justify-between items-center p-3 text-left font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-[#16213e]/50 hover:bg-gray-100 dark:hover:bg-[#16213e] transition-colors"
         aria-expanded={isOpen}
         aria-controls={panelId}
       >
@@ -29,7 +29,7 @@ export const AccordionItem: React.FC<AccordionItemProps> = ({ title, children })
           isOpen ? 'max-h-96' : 'max-h-0'
         }`}
       >
-        <div className="p-3 bg-white dark:bg-gray-800">
+        <div className="p-3 bg-white dark:bg-[#0f3460] transition-colors duration-300">
           {children}
         </div>
       </div>

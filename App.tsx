@@ -14,6 +14,8 @@ import { Toast } from './components/Toast';
 import { MobileSidebar } from './components/MobileSidebar';
 import EssayGenerator from './components/EssayGenerator';
 import { ComparisonView } from './components/ComparisonView';
+import { SunIcon } from './components/icons/SunIcon';
+import { MoonIcon } from './components/icons/MoonIcon';
 
 type Content =
   | { type: 'initial' }
@@ -34,7 +36,21 @@ const App: React.FC = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [lastViewedConcept, setLastViewedConcept] = useState<{ title: string } | null>(null);
   const [comparisonMode, setComparisonMode] = useState<{ active: boolean; item1: string }>({ active: false, item1: '' });
+  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
 
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
 
   useEffect(() => {
     if (toastMessage) {
@@ -213,10 +229,19 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-200">
-      <header className="flex-shrink-0 z-20 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-sm p-4 border-b border-gray-200 dark:border-gray-700">
+    <div className="h-screen w-screen flex flex-col bg-gray-100 dark:bg-[#1a1a2e] text-gray-900 dark:text-[#e0e0e0] transition-colors duration-300">
+      <header className="relative flex-shrink-0 z-20 bg-white/80 dark:bg-[#0f3460]/80 backdrop-blur-md shadow-sm p-4 border-b border-gray-200 dark:border-[#2a2a4e] transition-colors duration-300">
+        <div className="absolute top-4 right-4 z-30">
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 rounded-full bg-gray-200 dark:bg-[#16213e] text-gray-800 dark:text-[#e0e0e0] hover:bg-gray-300 dark:hover:bg-[#2a2a4e] transition-colors duration-300"
+              aria-label="Téma váltása"
+            >
+              {isDarkMode ? <SunIcon className="w-6 h-6" /> : <MoonIcon className="w-6 h-6" />}
+            </button>
+        </div>
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">
+          <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-[#e0e0e0] mb-4">
             Történelmi Tudástár+
           </h1>
           <SearchBar 
@@ -230,7 +255,7 @@ const App: React.FC = () => {
             <div className="text-center mt-3">
               <button 
                 onClick={handleInitiateCompare}
-                className="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-full transition-colors"
+                className="px-4 py-2 text-sm bg-gray-200 dark:bg-[#16213e] hover:bg-gray-300 dark:hover:bg-[#2a2a4e] rounded-full transition-colors"
               >
                 Összehasonlítás ezzel: <span className="font-semibold">{lastViewedConcept.title}</span>
               </button>
@@ -249,7 +274,7 @@ const App: React.FC = () => {
 
             <aside className="hidden lg:block lg:col-span-1">
               <div className="sticky top-6">
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+                <div className="bg-white dark:bg-[#0f3460] rounded-xl shadow-lg transition-colors duration-300">
                   <SidePanel {...sidePanelProps} />
                 </div>
               </div>

@@ -41,6 +41,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({
   
   const handleRandomConcept = () => {
     if (isActionDisabled) return;
+    // FIX: Corrected typo from TOP_CONCEPts to TOP_CONCEPTS.
     const allConcepts = TOP_CONCEPTS.flatMap(group => group.concepts);
     const randomConcept = allConcepts[Math.floor(Math.random() * allConcepts.length)];
     onSearch(randomConcept);
@@ -68,17 +69,17 @@ export const SidePanel: React.FC<SidePanelProps> = ({
     <div className="p-6 space-y-8">
       {/* Témakörök Section */}
       <section>
-        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">Témakörök</h3>
+        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-[#e0e0e0]">Témakörök</h3>
         <div className="grid grid-cols-2 gap-3">
           {Object.keys(TOPICS).map(topic => (
             <button
               key={topic}
               onClick={() => handleTopicClick(topic)}
               disabled={isActionDisabled}
-              className={`px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#0f3460] focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed ${
                 activeTopic === topic
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
+                  ? 'bg-blue-600 text-white dark:bg-[#16c784]'
+                  : 'bg-gray-200 dark:bg-[#16213e] hover:bg-gray-300 dark:hover:bg-[#2a2a4e]'
               }`}
             >
               {topic}
@@ -86,7 +87,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({
           ))}
         </div>
         {activeTopic && (
-          <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg max-h-48 overflow-y-auto">
+          <div className="mt-4 p-3 bg-gray-50 dark:bg-[#16213e]/50 rounded-lg max-h-48 overflow-y-auto">
             <ul className="space-y-2">
               {(TOPICS[activeTopic as keyof typeof TOPICS]).map(term => (
                 <li key={term}>
@@ -106,7 +107,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({
 
       {/* Top 100 Section */}
       <section>
-        <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-100">Top 100 érettségi fogalom</h3>
+        <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-[#e0e0e0]">Top 100 érettségi fogalom</h3>
         <div className="space-y-2">
           {TOP_CONCEPTS.map(group => (
             <AccordionItem key={group.category} title={group.category}>
@@ -130,11 +131,11 @@ export const SidePanel: React.FC<SidePanelProps> = ({
       
       {/* Random Concept Section */}
       <section>
-          <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">Random fogalom gyakorlása</h3>
+          <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-[#e0e0e0]">Random fogalom gyakorlása</h3>
           <button
             onClick={handleRandomConcept}
             disabled={isActionDisabled}
-            className="w-full flex items-center justify-center px-4 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-indigo-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center px-4 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#0f3460] focus:ring-indigo-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             <DiceIcon className="w-5 h-5 mr-2" />
             Adj egy véletlen érettségi fogalmat
@@ -144,11 +145,11 @@ export const SidePanel: React.FC<SidePanelProps> = ({
 
       {/* Journal Section */}
       <section>
-        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">Fogalomnapló</h3>
+        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-[#e0e0e0]">Fogalomnapló</h3>
         <button
           onClick={onShowJournal}
           disabled={isActionDisabled}
-          className="w-full relative flex items-center justify-center px-4 py-3 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-amber-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="w-full relative flex items-center justify-center px-4 py-3 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#0f3460] focus:ring-amber-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           <BookOpenIcon className="w-5 h-5 mr-2" />
           Fogalomnapló megjelenítése
@@ -162,12 +163,12 @@ export const SidePanel: React.FC<SidePanelProps> = ({
       
       {/* Essay Generator Section */}
       <section>
-        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">Érettségi Esszémotor (AI)</h3>
+        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-[#e0e0e0]">Érettségi Esszémotor (AI)</h3>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Indítsd el a mesterséges intelligencia alapú esszéíró modult, ahol részletes beállításokkal készíthetsz vázlatot, teljes esszét vagy forráselemzést.</p>
         <button
             onClick={onShowEssayGenerator}
             disabled={isActionDisabled}
-            className="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-green-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#0f3460] focus:ring-green-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
             <FeatherIcon className="w-5 h-5 mr-2" />
             Esszémotor indítása
@@ -176,7 +177,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({
 
       {/* Timeline Generator Section */}
       <section>
-        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">Interaktív Idővonal</h3>
+        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-[#e0e0e0]">Interaktív Idővonal</h3>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Generálj vizuális idővonalat egy történelmi korszak vagy eseménysorozat legfontosabb pontjaiból.</p>
         <form onSubmit={handleTimelineSubmit} className="flex gap-2">
           <input
@@ -185,12 +186,12 @@ export const SidePanel: React.FC<SidePanelProps> = ({
             onChange={(e) => setTimelineTopic(e.target.value)}
             placeholder="Téma, pl. 'Francia forradalom'"
             disabled={isActionDisabled}
-            className="flex-grow px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-sm"
+            className="flex-grow px-3 py-2 bg-gray-50 dark:bg-[#16213e] border border-gray-300 dark:border-[#2a2a4e] rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-sm"
           />
           <button
             type="submit"
             disabled={isActionDisabled || !timelineTopic.trim()}
-            className="px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-purple-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#0f3460] focus:ring-purple-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
              <TimelineIcon className="w-5 h-5" />
           </button>
@@ -199,7 +200,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({
 
       {/* Comparison Section */}
       <section>
-        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">Fogalmak Összehasonlítása</h3>
+        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-[#e0e0e0]">Fogalmak Összehasonlítása</h3>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Hasonlíts össze két történelmi fogalmat, eseményt vagy személyt.</p>
         <form onSubmit={handleComparisonSubmit} className="space-y-3">
           <input
@@ -208,7 +209,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({
             onChange={(e) => setConcept1(e.target.value)}
             placeholder="1. fogalom, pl. 'Jakobinus diktatúra'"
             disabled={isActionDisabled}
-            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-sm"
+            className="w-full px-3 py-2 bg-gray-50 dark:bg-[#16213e] border border-gray-300 dark:border-[#2a2a4e] rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-sm"
           />
           <input
             type="text"
@@ -216,12 +217,12 @@ export const SidePanel: React.FC<SidePanelProps> = ({
             onChange={(e) => setConcept2(e.target.value)}
             placeholder="2. fogalom, pl. 'Sztálini diktatúra'"
             disabled={isActionDisabled}
-            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-sm"
+            className="w-full px-3 py-2 bg-gray-50 dark:bg-[#16213e] border border-gray-300 dark:border-[#2a2a4e] rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-sm"
           />
           <button
             type="submit"
             disabled={isActionDisabled || !concept1.trim() || !concept2.trim()}
-            className="w-full flex items-center justify-center px-4 py-3 bg-cyan-600 text-white font-semibold rounded-lg hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-cyan-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center px-4 py-3 bg-cyan-600 text-white font-semibold rounded-lg hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#0f3460] focus:ring-cyan-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
              <ScaleIcon className="w-5 h-5 mr-2" />
              Hasonlítsd össze!
@@ -231,11 +232,11 @@ export const SidePanel: React.FC<SidePanelProps> = ({
 
       {/* Export Section */}
       <section>
-        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">Exportálás</h3>
+        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-[#e0e0e0]">Exportálás</h3>
         <button
           onClick={onExport}
           disabled={isExportDisabled}
-          className="w-full px-4 py-3 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-gray-500 transition-colors disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
+          className="w-full px-4 py-3 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#0f3460] focus:ring-gray-500 transition-colors disabled:bg-gray-400 dark:disabled:bg-gray-700 disabled:cursor-not-allowed"
         >
           Exportálás / másolás Word számára
         </button>

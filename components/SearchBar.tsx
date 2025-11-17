@@ -47,16 +47,16 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           onChange={(e) => setQuery(e.target.value)}
           placeholder={placeholderText}
           disabled={isLoading}
-          className={`w-full px-5 py-3 text-lg bg-gray-50 dark:bg-gray-700 border rounded-full focus:ring-2 focus:outline-none transition-all duration-300 placeholder-gray-400 dark:placeholder-gray-500 disabled:opacity-50 ${
+          className={`w-full px-5 py-3 text-lg bg-gray-50 dark:bg-[#16213e] border rounded-full focus:ring-2 focus:outline-none transition-all duration-300 placeholder-gray-400 dark:placeholder-gray-400 disabled:opacity-50 ${
             isCompareMode 
-            ? 'border-indigo-400 dark:border-indigo-500 focus:ring-indigo-500' 
-            : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-blue-400'
+            ? 'border-indigo-400 dark:border-[#16c784]' 
+            : 'border-gray-300 dark:border-[#2a2a4e] focus:ring-blue-500 dark:focus:ring-blue-400'
           }`}
         />
         <button
           type="submit"
           disabled={isLoading || !query.trim()}
-          className="absolute top-1/2 right-3 -translate-y-1/2 p-2 rounded-full text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800 disabled:bg-gray-400 dark:disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+          className="absolute top-1/2 right-3 -translate-y-1/2 p-2 rounded-full text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-[#16c784] dark:hover:bg-green-500 dark:focus:ring-offset-[#1a1a2e] disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
           aria-label="Keresés"
         >
           <SearchIcon className="w-6 h-6" />
@@ -65,7 +65,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       {isCompareMode && (
         <button
           onClick={onCancelCompare}
-          className="absolute top-1/2 right-16 -translate-y-1/2 p-1.5 rounded-full text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+          className="absolute top-1/2 right-16 -translate-y-1/2 p-1.5 rounded-full text-gray-500 dark:text-[#e0e0e0] bg-gray-200 dark:bg-[#2a2a4e] hover:bg-gray-300 dark:hover:bg-[#16c784] transition-colors"
           aria-label="Összehasonlítás megszakítása"
         >
           <CloseIcon className="w-5 h-5" />

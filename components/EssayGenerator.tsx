@@ -25,7 +25,7 @@ export default function EssayGenerator() {
   };
 
   return (
-    <div className="rounded-2xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 p-8 shadow-xl space-y-6 animate-fade-in">
+    <div className="rounded-2xl bg-white dark:bg-[#16213e] text-gray-900 dark:text-[#e0e0e0] p-8 shadow-xl space-y-6 animate-fade-in transition-colors duration-300">
       <h2 className="text-3xl font-bold">Érettségi Esszémotor (AI)</h2>
 
       {/* Téma mező */}
@@ -36,7 +36,7 @@ export default function EssayGenerator() {
           placeholder="Pl.: A reformkor gazdasági és társadalmi folyamatai"
           value={topic}
           onChange={(e) => setTopic(e.target.value)}
-          className="w-full px-4 py-3 rounded-xl mt-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600"
+          className="w-full px-4 py-3 rounded-xl mt-2 bg-gray-100 dark:bg-[#1a1a2e] text-gray-900 dark:text-white border border-gray-300 dark:border-[#2a2a4e]"
         />
       </div>
 
@@ -46,7 +46,7 @@ export default function EssayGenerator() {
         <select
           value={level}
           onChange={(e) => setLevel(e.target.value)}
-          className="w-full px-4 py-3 rounded-xl mt-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"
+          className="w-full px-4 py-3 rounded-xl mt-2 bg-gray-100 dark:bg-[#1a1a2e] text-gray-900 dark:text-white border-gray-300 dark:border-[#2a2a4e]"
         >
           <option value="kozep">Középszint</option>
           <option value="emelt">Emelt szint</option>
@@ -59,7 +59,7 @@ export default function EssayGenerator() {
         <select
           value={style}
           onChange={(e) => setStyle(e.target.value)}
-          className="w-full px-4 py-3 rounded-xl mt-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"
+          className="w-full px-4 py-3 rounded-xl mt-2 bg-gray-100 dark:bg-[#1a1a2e] text-gray-900 dark:text-white border-gray-300 dark:border-[#2a2a4e]"
         >
           <option value="tomor">Tömör</option>
           <option value="reszletes">Részletes</option>
@@ -73,7 +73,7 @@ export default function EssayGenerator() {
         <select
           value={mode}
           onChange={(e) => setMode(e.target.value)}
-          className="w-full px-4 py-3 rounded-xl mt-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600"
+          className="w-full px-4 py-3 rounded-xl mt-2 bg-gray-100 dark:bg-[#1a1a2e] text-gray-900 dark:text-white border-gray-300 dark:border-[#2a2a4e]"
         >
           <option value="vazlat">Esszévázlat</option>
           <option value="teljes">Teljes esszé</option>
@@ -85,15 +85,15 @@ export default function EssayGenerator() {
       <button
         onClick={handleGenerate}
         disabled={loading || !topic.trim()}
-        className="w-full px-6 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 transition font-semibold text-white disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
+        className="w-full px-6 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 dark:bg-[#16c784] dark:hover:bg-green-500 transition font-semibold text-white disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
       >
         {loading ? "Generálás..." : "Esszé készítése"}
       </button>
 
       {/* Eredmény */}
       {result && (
-        <div className="mt-6 p-6 bg-gray-100 dark:bg-gray-900/50 rounded-2xl whitespace-pre-line">
-          <h3 className="text-xl font-bold mb-4 border-b pb-2 dark:border-gray-600">Generált eredmény:</h3>
+        <div className="mt-6 p-6 bg-gray-100 dark:bg-[#1a1a2e]/50 rounded-2xl whitespace-pre-line">
+          <h3 className="text-xl font-bold mb-4 border-b pb-2 dark:border-[#2a2a4e]">Generált eredmény:</h3>
           <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none">
             {result}
           </div>
