@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Article, EventDetail, TimelineEvent, JournalEntry, Comparison } from './types';
+import { Article, EventDetail, TimelineEvent, JournalEntry, ComparisonData } from './types';
 import { fetchConcept, fetchTimelineEvents, fetchEventDetail, fetchShortDefinition, fetchComparison } from './services/geminiService';
 import { SearchBar } from './components/SearchBar';
 import { ArticleView } from './components/ArticleView';
@@ -23,7 +23,7 @@ type Content =
   | { type: 'essayGenerator' }
   | { type: 'timeline', data: { topic: string, events: TimelineEvent[] } }
   | { type: 'eventDetail', data: EventDetail }
-  | { type: 'comparison', data: Comparison };
+  | { type: 'comparison', data: ComparisonData };
 
 
 const App: React.FC = () => {
@@ -32,6 +32,9 @@ const App: React.FC = () => {
   const [isJournalModalOpen, setJournalModalOpen] = useState<boolean>(false);
   const [journal, setJournal] = useState<JournalEntry[]>([]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [lastViewedConcept, setLastViewedConcept] = useState<{ title: string } | null>(null);
+  const [comparisonMode, setComparisonMode] = useState<{ active: boolean; item1: string }>({ active: false, item1: '' });
+
 
   useEffect(() => {
     if (toastMessage) {
@@ -39,10 +42,34 @@ const App: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [toastMessage]);
+  
+  const handleCompareConcepts = useCallback(async (concept1: string, concept2: string) => {
+    if (content.type === 'loading') return;
+    setContent({ type: 'loading', message: 'Összehasonlítás készítése...' });
+    try {
+        const result = await fetchComparison(concept1, concept2);
+        const newComparison: ComparisonData = {
+            ...result,
+            id: `${concept1}-${concept2}-${Date.now()}`
+        };
+        setContent({ type: 'comparison', data: newComparison });
+        setLastViewedConcept({ title: `Összehasonlítás: ${concept1} vs ${concept2}` });
+    } catch (err) {
+        setContent({ type: 'error', message: 'Hiba történt az összehasonlítás közben. Próbálja újra.' });
+        console.error(err);
+    } finally {
+        setComparisonMode({ active: false, item1: '' });
+    }
+  }, [content]);
 
   const handleSearch = useCallback(async (term: string) => {
     if (content.type === 'loading') return;
     
+    if (comparisonMode.active) {
+        await handleCompareConcepts(comparisonMode.item1, term);
+        return;
+    }
+
     if (content.type === 'article' && content.data.title.toLowerCase() === term.toLowerCase()) {
       return;
     }
@@ -55,11 +82,12 @@ const App: React.FC = () => {
         id: `${term}-${Date.now()}`
       };
       setContent({ type: 'article', data: newArticle });
+      setLastViewedConcept({ title: newArticle.title });
     } catch (err) {
       setContent({ type: 'error', message: 'Hiba történt a fogalom keresése közben. Kérjük, próbálja újra.' });
       console.error(err);
     }
-  }, [content]);
+  }, [content, comparisonMode]);
   
   const handleShowEssayGenerator = useCallback(() => {
     setContent({ type: 'essayGenerator' });
@@ -71,6 +99,7 @@ const App: React.FC = () => {
      try {
       const result = await fetchTimelineEvents(topic);
       setContent({ type: 'timeline', data: { topic, events: result } });
+      setLastViewedConcept({ title: `Idővonal: ${topic}`});
     } catch (err) {
       setContent({ type: 'error', message: 'Hiba történt az idővonal létrehozása közben. Kérjük, próbálja újra.' });
       console.error(err);
@@ -92,6 +121,7 @@ const App: React.FC = () => {
             id: `${eventName}-${Date.now()}`
         };
         setContent({ type: 'eventDetail', data: newEventDetail });
+        setLastViewedConcept({ title: newEventDetail.title });
     } catch (err) {
         setContent({ type: 'error', message: 'Hiba történt az esemény részleteinek lekérése közben. Kérjük, próbálja újra.' });
         console.error(err);
@@ -108,7 +138,7 @@ const App: React.FC = () => {
         const newEntry: JournalEntry = { term, shortDefinition };
         setJournal(prev => {
             const newJournal = [...prev, newEntry];
-            setToastMessage(`A fogalom bekerült a naplódba. Jelenlegi elemek: ${newJournal.length}.`);
+            setToastMessage(`A fogalom bekerült a naplódból. Jelenlegi elemek: ${newJournal.length}.`);
             return newJournal;
         });
     } catch (error) {
@@ -117,22 +147,6 @@ const App: React.FC = () => {
     }
 }, [journal]);
 
-  const handleCompareConcepts = useCallback(async (concept1: string, concept2: string) => {
-    if (content.type === 'loading') return;
-    setContent({ type: 'loading', message: 'Összehasonlítás készítése...' });
-    try {
-        const result = await fetchComparison(concept1, concept2);
-        const newComparison: Comparison = {
-            ...result,
-            id: `${concept1}-${concept2}-${Date.now()}`
-        };
-        setContent({ type: 'comparison', data: newComparison });
-    } catch (err) {
-        setContent({ type: 'error', message: 'Hiba történt az összehasonlítás közben. Próbálja újra.' });
-        console.error(err);
-    }
-  }, [content]);
-
   const handleShowJournal = () => {
       setJournalModalOpen(true);
   };
@@ -140,6 +154,13 @@ const App: React.FC = () => {
   const handleExport = () => {
     if (content.type === 'article' || content.type === 'timeline' || content.type === 'comparison') {
       setExportModalOpen(true);
+    }
+  };
+  
+  const handleInitiateCompare = () => {
+    if (lastViewedConcept) {
+      setComparisonMode({ active: true, item1: lastViewedConcept.title });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -198,7 +219,23 @@ const App: React.FC = () => {
           <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">
             Történelmi Tudástár+
           </h1>
-          <SearchBar onSearch={handleSearch} isLoading={content.type === 'loading'} />
+          <SearchBar 
+            onSearch={handleSearch} 
+            isLoading={content.type === 'loading'}
+            isCompareMode={comparisonMode.active}
+            item1Title={comparisonMode.item1}
+            onCancelCompare={() => setComparisonMode({ active: false, item1: '' })}
+          />
+           {lastViewedConcept && !comparisonMode.active && content.type !== 'initial' && (
+            <div className="text-center mt-3">
+              <button 
+                onClick={handleInitiateCompare}
+                className="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-full transition-colors"
+              >
+                Összehasonlítás ezzel: <span className="font-semibold">{lastViewedConcept.title}</span>
+              </button>
+            </div>
+          )}
         </div>
       </header>
 

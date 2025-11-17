@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { Article, EventDetail, TimelineEvent, Comparison } from '../types';
+import { Article, EventDetail, TimelineEvent, ComparisonData } from '../types';
 
 if (!process.env.API_KEY) {
   throw new Error("API_KEY environment variable not set");
@@ -111,34 +111,55 @@ const eventDetailResponseSchema = {
 const comparisonResponseSchema = {
     type: Type.OBJECT,
     properties: {
-        concept1: { type: Type.STRING, description: "Az első összehasonlított fogalom." },
-        concept2: { type: Type.STRING, description: "A második összehasonlított fogalom." },
+        item1: {
+            type: Type.OBJECT,
+            description: "Az első összehasonlított elem részletes adatai.",
+            properties: {
+                title: { type: Type.STRING, description: "Az elem címe." },
+                type: { type: Type.STRING, description: "Az elem típusa ('event', 'person', vagy 'concept')." },
+                description: { type: Type.STRING, description: "Az elem rövid, 1-2 mondatos leírása." },
+                date: { type: Type.STRING, description: "Az elemhez kapcsolódó releváns dátum vagy időszak. Nem kötelező." },
+                significance: { type: Type.STRING, description: "Az elem történelmi jelentősége 1-2 mondatban." },
+            },
+            required: ['title', 'type', 'description', 'significance']
+        },
+        item2: {
+            type: Type.OBJECT,
+            description: "A második összehasonlított elem részletes adatai.",
+            properties: {
+                title: { type: Type.STRING, description: "Az elem címe." },
+                type: { type: Type.STRING, description: "Az elem típusa ('event', 'person', vagy 'concept')." },
+                description: { type: Type.STRING, description: "Az elem rövid, 1-2 mondatos leírása." },
+                date: { type: Type.STRING, description: "Az elemhez kapcsolódó releváns dátum vagy időszak. Nem kötelező." },
+                significance: { type: Type.STRING, description: "Az elem történelmi jelentősége 1-2 mondatban." },
+            },
+            required: ['title', 'type', 'description', 'significance']
+        },
         similarities: {
             type: Type.ARRAY,
-            description: "A két fogalom közötti legalább 5 legfontosabb hasonlóság, listaként.",
+            description: "A két elem közötti legalább 5 legfontosabb hasonlóság.",
             items: { type: Type.STRING }
         },
         differences: {
             type: Type.ARRAY,
-            description: "A két fogalom közötti legalább 5 legfontosabb különbség, listaként.",
+            description: "A két elem közötti legalább 5 legfontosabb különbség.",
             items: { type: Type.STRING }
         },
-        temporalRelations: {
+        temporalRelation: {
             type: Type.STRING,
-            description: "Az időbeli kapcsolatok elemzése: egy időben zajlottak-e, mi volt előbb, van-e ok-okozati kapcsolat. Fogalmazz egyszerűen, 2-3 mondatban."
+            description: "Az időbeli kapcsolatok elemzése: egy időben zajlottak-e, mi volt előbb, van-e átfedés."
         },
-        context: {
+        historicalContext: {
             type: Type.STRING,
-            description: "A politikai és társadalmi kontextus bemutatása, amelyben a két dolog létezett vagy történt. Fogalmazz egyszerűen, 2-3 mondatban."
+            description: "A politikai és társadalmi kontextus bemutatása, amelyben a két dolog létezett vagy történt."
         },
-        longTermImpacts: {
+        causality: {
             type: Type.STRING,
-            description: "A két dolog hosszú távú hatásainak összevetése. Fogalmazz egyszerűen, 2-3 mondatban."
+            description: "Az ok-okozati kapcsolatok elemzése és a hosszú távú hatások összevetése."
         }
     },
-    required: ["concept1", "concept2", "similarities", "differences", "temporalRelations", "context", "longTermImpacts"]
+    required: ["item1", "item2", "similarities", "differences", "temporalRelation", "historicalContext", "causality"]
 };
-
 
 export const fetchConcept = async (term: string): Promise<Omit<Article, 'id'>> => {
   const systemInstruction = `
@@ -281,22 +302,24 @@ export const fetchShortDefinition = async (term: string): Promise<string> => {
   }
 };
 
-export const fetchComparison = async (concept1: string, concept2: string): Promise<Omit<Comparison, 'id'>> => {
+export const fetchComparison = async (concept1: string, concept2: string): Promise<Omit<ComparisonData, 'id'>> => {
   const systemInstruction = `
     Te egy történész mesterséges intelligencia vagy. A célközönséged 14-15 éves magyar diákok. Használj egyszerű, érthető magyarázatokat.
-    A feladatod, hogy a megadott két fogalmat összehasonlítsd a JSON séma alapján.
-    A válaszod legyen tankönyvi stílusú, formális és feleljen meg a történelem érettségi követelményeinek.
+    A feladatod, hogy a megadott két történelmi elemet részletesen összehasonlítsd a JSON séma alapján.
+    A válaszod legyen tankönyvi stílusú, formális és feleljen meg a magyar történelem érettségi követelményeinek.
     A válaszodat a megadott JSON séma szerint add vissza. A válasz nyelve magyar.
   `;
 
   const prompt = `Hasonlítsd össze részletesen a következő két történelmi elemet: "${concept1}" és "${concept2}".
 
-A válaszban add meg a következőket a JSON séma szerint:
+Elemezd mindkét elemet külön-külön is (leírás, jelentőség), majd vesd őket össze.
+
+Add meg a válaszban a JSON séma szerint:
 - Hasonlóságok (minimum 5)
 - Különbségek (minimum 5)
-- Időbeli kapcsolatok (kik voltak egyidősek, mi volt az okozat-okozati kapcsolat)
+- Időbeli kapcsolatok
 - Politikai/társadalmi kontextus
-- Hosszú távú hatások
+- Ok-okozati összefüggések és hosszú távú hatások
 `;
 
   try {
@@ -314,11 +337,11 @@ A válaszban add meg a következőket a JSON séma szerint:
     const jsonText = response.text.trim();
     const parsedData = JSON.parse(jsonText);
 
-    if (!parsedData.concept1 || !parsedData.concept2 || !Array.isArray(parsedData.similarities) || !Array.isArray(parsedData.differences) || !parsedData.temporalRelations || !parsedData.context || !parsedData.longTermImpacts) {
+    if (!parsedData.item1 || !parsedData.item2 || !Array.isArray(parsedData.similarities) || !Array.isArray(parsedData.differences) || !parsedData.temporalRelation || !parsedData.historicalContext || !parsedData.causality) {
         throw new Error("Invalid data structure for comparison received from API.");
     }
 
-    return parsedData as Omit<Comparison, 'id'>;
+    return parsedData as Omit<ComparisonData, 'id'>;
 
   } catch (error) {
     console.error("Error fetching or parsing comparison from Gemini API:", error);

@@ -1,91 +1,71 @@
-import React, { useState, useEffect } from 'react';
-import { Comparison } from '../types';
-import { CopyIcon } from './icons/CopyIcon';
-import { CheckIcon } from './icons/CheckIcon'; // Assuming CheckIcon exists
+import React from 'react';
+import { ComparisonData } from '../types';
+import { ArrowRightIcon } from './icons/ArrowRightIcon';
 
-const ComparisonSection: React.FC<{ title: string; children: React.ReactNode; borderColor: string; }> = ({ title, children, borderColor }) => (
-    <div className={`p-6 border-2 ${borderColor} rounded-xl bg-white dark:bg-gray-800 shadow-md`}>
-        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">{title}</h3>
+const ItemCard: React.FC<{ item: ComparisonData['item1'], bgColor: string }> = ({ item, bgColor }) => (
+    <div className={`p-6 rounded-2xl shadow-lg ${bgColor} h-full flex flex-col`}>
+        <h3 className="text-2xl font-bold mb-2 text-gray-800 dark:text-gray-100">{item.title}</h3>
+        {item.date && <p className="font-semibold text-gray-600 dark:text-gray-300 mb-3">{item.date}</p>}
+        <div className="flex-grow space-y-4 text-gray-700 dark:text-gray-400">
+            <p>{item.description}</p>
+            <p><span className="font-bold text-gray-800 dark:text-gray-200">Jelentőség:</span> {item.significance}</p>
+        </div>
+    </div>
+);
+
+const Section: React.FC<{ title: string, children: React.ReactNode, className?: string }> = ({ title, children, className = '' }) => (
+    <div className={`p-6 rounded-2xl shadow-lg ${className}`}>
+        <h3 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">{title}</h3>
         {children}
     </div>
 );
 
-const DetailCard: React.FC<{ title: string; content: string; }> = ({ title, content }) => (
-    <div>
-        <h4 className="font-semibold text-lg text-gray-700 dark:text-gray-300 mb-2">{title}</h4>
-        <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{content}</p>
-    </div>
-);
-
-export const ComparisonView: React.FC<{ comparison: Comparison }> = ({ comparison }) => {
-    const [hasCopied, setHasCopied] = useState(false);
-
-    const generateComparisonText = () => {
-        let text = `Összehasonlítás: ${comparison.concept1} vs ${comparison.concept2}\n\n`;
-        text += "HASONLÓSÁGOK:\n";
-        comparison.similarities.forEach(s => text += `- ${s}\n`);
-        text += "\nKÜLÖNBSÉGEK:\n";
-        comparison.differences.forEach(d => text += `- ${d}\n`);
-        text += `\nIDŐBELI KAPCSOLATOK:\n${comparison.temporalRelations}\n`;
-        text += `\nPOLITIKAI/TÁRSADALMI KONTEXTUS:\n${comparison.context}\n`;
-        text += `\nHOSSZÚ TÁVÚ HATÁSOK:\n${comparison.longTermImpacts}\n`;
-        return text;
-    };
-
-    const handleCopy = () => {
-        navigator.clipboard.writeText(generateComparisonText());
-        setHasCopied(true);
-    };
-
-    useEffect(() => {
-        if (hasCopied) {
-            const timer = setTimeout(() => setHasCopied(false), 2000);
-            return () => clearTimeout(timer);
-        }
-    }, [hasCopied]);
-
+export const ComparisonView: React.FC<{ comparison: ComparisonData }> = ({ comparison }) => {
     return (
-        <div className="bg-gray-100 dark:bg-gray-900 p-4 sm:p-6 animate-fade-in">
-            <article className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 relative">
-                <div className="text-center mb-8">
-                    <h2 className="text-3xl font-extrabold text-gray-800 dark:text-gray-100">{comparison.concept1}</h2>
-                    <p className="text-xl text-gray-500 dark:text-gray-400 my-2">vs</p>
-                    <h2 className="text-3xl font-extrabold text-gray-800 dark:text-gray-100">{comparison.concept2}</h2>
-                </div>
+        <div className="p-2 sm:p-4 md:p-6 animate-fade-in space-y-8">
+             <div className="text-center">
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-800 dark:text-gray-100">{`Összehasonlítás`}</h2>
+            </div>
+            {/* Item Details */}
+            <div className="grid md:grid-cols-2 gap-8">
+                <ItemCard item={comparison.item1} bgColor="bg-blue-50 dark:bg-gray-800 border border-blue-200 dark:border-blue-700" />
+                <ItemCard item={comparison.item2} bgColor="bg-green-50 dark:bg-gray-800 border border-green-200 dark:border-green-700" />
+            </div>
 
-                <div className="grid md:grid-cols-2 gap-8 mb-8">
-                    <div className="p-6 rounded-xl bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700">
-                        <h3 className="text-2xl font-bold text-green-800 dark:text-green-200 mb-4">Hasonlóságok</h3>
-                        <ul className="space-y-3 list-disc list-inside text-gray-700 dark:text-gray-300">
-                            {comparison.similarities.map((item, index) => <li key={index}>{item}</li>)}
-                        </ul>
+            {/* Similarities & Differences */}
+            <div className="grid lg:grid-cols-2 gap-8">
+                <Section title="Hasonlóságok" className="bg-teal-50 dark:bg-gray-800 border border-teal-200 dark:border-teal-700">
+                    <ul className="space-y-3 list-disc list-inside text-gray-700 dark:text-gray-300">
+                        {comparison.similarities.map((s, i) => <li key={i}>{s}</li>)}
+                    </ul>
+                </Section>
+                 <Section title="Különbségek" className="bg-rose-50 dark:bg-gray-800 border border-rose-200 dark:border-rose-700">
+                    <ul className="space-y-3 list-disc list-inside text-gray-700 dark:text-gray-300">
+                        {comparison.differences.map((d, i) => <li key={i}>{d}</li>)}
+                    </ul>
+                </Section>
+            </div>
+
+            {/* Deeper Analysis */}
+            <Section title="Összefüggések Elemzése" className="bg-gray-100 dark:bg-gray-800">
+                <div className="space-y-6">
+                    <div>
+                        <h4 className="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-200">Időbeli Kapcsolat</h4>
+                        <p className="text-gray-600 dark:text-gray-400">{comparison.temporalRelation}</p>
                     </div>
-                    <div className="p-6 rounded-xl bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700">
-                        <h3 className="text-2xl font-bold text-blue-800 dark:text-blue-200 mb-4">Különbségek</h3>
-                        <ul className="space-y-3 list-disc list-inside text-gray-700 dark:text-gray-300">
-                            {comparison.differences.map((item, index) => <li key={index}>{item}</li>)}
-                        </ul>
+                     <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                        <h4 className="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-200">Történelmi Kontextus</h4>
+                        <p className="text-gray-600 dark:text-gray-400">{comparison.historicalContext}</p>
+                    </div>
+                     <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                        <h4 className="font-semibold text-lg mb-2 flex items-center text-gray-800 dark:text-gray-200">
+                            <ArrowRightIcon className="w-5 h-5 mr-2 text-indigo-500" />
+                            Ok-okozati viszony és hatások
+                        </h4>
+                        <p className="text-gray-600 dark:text-gray-400">{comparison.causality}</p>
                     </div>
                 </div>
-
-                <div className="p-6 rounded-xl bg-gray-200 dark:bg-gray-700/50 space-y-6">
-                     <h3 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-200 mb-4">Mélyebb Elemzés</h3>
-                    <DetailCard title="Időbeli kapcsolatok" content={comparison.temporalRelations} />
-                    <DetailCard title="Politikai és társadalmi kontextus" content={comparison.context} />
-                    <DetailCard title="Hosszú távú hatások" content={comparison.longTermImpacts} />
-                </div>
-                
-                 <div className="mt-8 text-center">
-                    <button
-                        onClick={handleCopy}
-                        className="inline-flex items-center justify-center px-6 py-3 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-gray-500 transition-all duration-300"
-                    >
-                        {hasCopied ? <CheckIcon className="w-5 h-5 mr-2" /> : <CopyIcon className="w-5 h-5 mr-2" />}
-                        {hasCopied ? 'Másolva!' : 'Összehasonlítás másolása'}
-                    </button>
-                </div>
-
-            </article>
+            </Section>
             <style>{`
                 @keyframes fade-in {
                     from { opacity: 0; transform: translateY(10px); }

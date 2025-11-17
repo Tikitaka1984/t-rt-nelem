@@ -39,13 +39,25 @@ export interface JournalEntry {
   shortDefinition: string;
 }
 
-export interface Comparison {
-  id:string;
-  concept1: string;
-  concept2: string;
+export interface ComparisonData {
+  id: string;
+  item1: {
+    title: string;
+    type: 'event' | 'person' | 'concept';
+    description: string;
+    date?: string;
+    significance: string;
+  };
+  item2: {
+    title: string;
+    type: 'event' | 'person' | 'concept';
+    description: string;
+    date?: string;
+    significance: string;
+  };
   similarities: string[];
   differences: string[];
-  temporalRelations: string;
-  context: string;
-  longTermImpacts: string;
+  temporalRelation: string;
+  historicalContext: string;
+  causality: string;
 }
