@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useId } from 'react';
-import { Article, TimelineEvent } from '../types';
+import { Article, TimelineEvent, Comparison } from '../types';
 import { CloseIcon } from './icons/CloseIcon';
 import { CopyIcon } from './icons/CopyIcon';
 
 interface ExportModalProps {
-  content: Article | { topic: string, events: TimelineEvent[] };
-  type: 'article' | 'timeline';
+  content: Article | { topic: string, events: TimelineEvent[] } | Comparison;
+  type: 'article' | 'timeline' | 'comparison';
   onClose: () => void;
 }
 
@@ -33,6 +33,19 @@ export const ExportModal: React.FC<ExportModalProps> = ({ content, type, onClose
           text += `Esemény: ${event.title}\n`;
           text += `Leírás: ${event.description}\n\n`;
         });
+        return text;
+      }
+      case 'comparison': {
+        const comparison = content as Comparison;
+        let text = `ÖSSZEHASONLÍTÁS: ${comparison.concept1} vs ${comparison.concept2}\n\n`;
+        text += `========================\nHASONLÓSÁGOK\n========================\n`;
+        comparison.similarities.forEach(s => text += `• ${s}\n`);
+        text += `\n========================\nKÜLÖNBSÉGEK\n========================\n`;
+        comparison.differences.forEach(d => text += `• ${d}\n`);
+        text += `\n========================\nMÉLYEBB ELEMZÉS\n========================\n`;
+        text += `\nIdőbeli kapcsolatok:\n${comparison.temporalRelations}\n`;
+        text += `\nPolitikai/társadalmi kontextus:\n${comparison.context}\n`;
+        text += `\nHosszú távú hatások:\n${comparison.longTermImpacts}\n`;
         return text;
       }
       default:

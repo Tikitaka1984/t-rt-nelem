@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Article, EventDetail, TimelineEvent, JournalEntry } from './types';
-import { fetchConcept, fetchTimelineEvents, fetchEventDetail, fetchShortDefinition } from './services/geminiService';
+import { Article, EventDetail, TimelineEvent, JournalEntry, Comparison } from './types';
+import { fetchConcept, fetchTimelineEvents, fetchEventDetail, fetchShortDefinition, fetchComparison } from './services/geminiService';
 import { SearchBar } from './components/SearchBar';
 import { ArticleView } from './components/ArticleView';
 import { LoadingSpinner } from './components/LoadingSpinner';
@@ -13,6 +13,7 @@ import { JournalModal } from './components/JournalModal';
 import { Toast } from './components/Toast';
 import { MobileSidebar } from './components/MobileSidebar';
 import EssayGenerator from './components/EssayGenerator';
+import { ComparisonView } from './components/ComparisonView';
 
 type Content =
   | { type: 'initial' }
@@ -21,7 +22,8 @@ type Content =
   | { type: 'article', data: Article }
   | { type: 'essayGenerator' }
   | { type: 'timeline', data: { topic: string, events: TimelineEvent[] } }
-  | { type: 'eventDetail', data: EventDetail };
+  | { type: 'eventDetail', data: EventDetail }
+  | { type: 'comparison', data: Comparison };
 
 
 const App: React.FC = () => {
@@ -115,12 +117,28 @@ const App: React.FC = () => {
     }
 }, [journal]);
 
+  const handleCompareConcepts = useCallback(async (concept1: string, concept2: string) => {
+    if (content.type === 'loading') return;
+    setContent({ type: 'loading', message: 'Összehasonlítás készítése...' });
+    try {
+        const result = await fetchComparison(concept1, concept2);
+        const newComparison: Comparison = {
+            ...result,
+            id: `${concept1}-${concept2}-${Date.now()}`
+        };
+        setContent({ type: 'comparison', data: newComparison });
+    } catch (err) {
+        setContent({ type: 'error', message: 'Hiba történt az összehasonlítás közben. Próbálja újra.' });
+        console.error(err);
+    }
+  }, [content]);
+
   const handleShowJournal = () => {
       setJournalModalOpen(true);
   };
 
   const handleExport = () => {
-    if (content.type === 'article' || content.type === 'timeline') {
+    if (content.type === 'article' || content.type === 'timeline' || content.type === 'comparison') {
       setExportModalOpen(true);
     }
   };
@@ -156,6 +174,8 @@ const App: React.FC = () => {
         return <TimelineView topic={content.data.topic} events={content.data.events} onEventClick={handleEventClick} />;
       case 'eventDetail':
         return <EventDetailView key={content.data.id} eventDetail={content.data} onTermClick={handleSearch} onAddToJournal={handleAddToJournal} />;
+      case 'comparison':
+        return <ComparisonView key={content.data.id} comparison={content.data} />;
     }
   };
   
@@ -167,7 +187,8 @@ const App: React.FC = () => {
       journalItemCount: journal.length,
       onExport: handleExport,
       isActionDisabled: content.type === 'loading',
-      isExportDisabled: content.type !== 'article' && content.type !== 'timeline'
+      isExportDisabled: !['article', 'timeline', 'comparison'].includes(content.type),
+      onCompare: handleCompareConcepts,
   };
 
   return (
@@ -205,7 +226,7 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {isExportModalOpen && (content.type === 'article' || content.type === 'timeline') && (
+      {isExportModalOpen && (content.type === 'article' || content.type === 'timeline' || content.type === 'comparison') && (
         <ExportModal content={content.data} type={content.type} onClose={() => setExportModalOpen(false)} />
       )}
       {isJournalModalOpen && (

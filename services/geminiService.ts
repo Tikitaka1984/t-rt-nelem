@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { Article, EventDetail, TimelineEvent } from '../types';
+import { Article, EventDetail, TimelineEvent, Comparison } from '../types';
 
 if (!process.env.API_KEY) {
   throw new Error("API_KEY environment variable not set");
@@ -107,6 +107,38 @@ const eventDetailResponseSchema = {
   },
   required: ["title", "explanation", "relatedConcepts", "relatedPersons"]
 };
+
+const comparisonResponseSchema = {
+    type: Type.OBJECT,
+    properties: {
+        concept1: { type: Type.STRING, description: "Az első összehasonlított fogalom." },
+        concept2: { type: Type.STRING, description: "A második összehasonlított fogalom." },
+        similarities: {
+            type: Type.ARRAY,
+            description: "A két fogalom közötti legalább 5 legfontosabb hasonlóság, listaként.",
+            items: { type: Type.STRING }
+        },
+        differences: {
+            type: Type.ARRAY,
+            description: "A két fogalom közötti legalább 5 legfontosabb különbség, listaként.",
+            items: { type: Type.STRING }
+        },
+        temporalRelations: {
+            type: Type.STRING,
+            description: "Az időbeli kapcsolatok elemzése: egy időben zajlottak-e, mi volt előbb, van-e ok-okozati kapcsolat. Fogalmazz egyszerűen, 2-3 mondatban."
+        },
+        context: {
+            type: Type.STRING,
+            description: "A politikai és társadalmi kontextus bemutatása, amelyben a két dolog létezett vagy történt. Fogalmazz egyszerűen, 2-3 mondatban."
+        },
+        longTermImpacts: {
+            type: Type.STRING,
+            description: "A két dolog hosszú távú hatásainak összevetése. Fogalmazz egyszerűen, 2-3 mondatban."
+        }
+    },
+    required: ["concept1", "concept2", "similarities", "differences", "temporalRelations", "context", "longTermImpacts"]
+};
+
 
 export const fetchConcept = async (term: string): Promise<Omit<Article, 'id'>> => {
   const systemInstruction = `
@@ -246,5 +278,53 @@ export const fetchShortDefinition = async (term: string): Promise<string> => {
   } catch (error) {
     console.error("Error fetching short definition from Gemini API:", error);
     throw new Error("Nem sikerült létrehozni a rövid definíciót.");
+  }
+};
+
+export const fetchComparison = async (concept1: string, concept2: string): Promise<Omit<Comparison, 'id'>> => {
+  const systemInstruction = `
+    Te egy történész mesterséges intelligencia vagy. A célközönséged 14-15 éves magyar diákok. Használj egyszerű, érthető magyarázatokat.
+    A feladatod, hogy a megadott két fogalmat összehasonlítsd a JSON séma alapján.
+    A válaszod legyen tankönyvi stílusú, formális és feleljen meg a történelem érettségi követelményeinek.
+    A válaszodat a megadott JSON séma szerint add vissza. A válasz nyelve magyar.
+  `;
+
+  const prompt = `Hasonlítsd össze részletesen a következő két történelmi elemet: "${concept1}" és "${concept2}".
+
+A válaszban add meg a következőket a JSON séma szerint:
+- Hasonlóságok (minimum 5)
+- Különbségek (minimum 5)
+- Időbeli kapcsolatok (kik voltak egyidősek, mi volt az okozat-okozati kapcsolat)
+- Politikai/társadalmi kontextus
+- Hosszú távú hatások
+`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-pro',
+      contents: prompt,
+      config: {
+        systemInstruction,
+        responseMimeType: "application/json",
+        responseSchema: comparisonResponseSchema,
+        temperature: 0.5,
+      },
+    });
+
+    const jsonText = response.text.trim();
+    const parsedData = JSON.parse(jsonText);
+
+    if (!parsedData.concept1 || !parsedData.concept2 || !Array.isArray(parsedData.similarities) || !Array.isArray(parsedData.differences) || !parsedData.temporalRelations || !parsedData.context || !parsedData.longTermImpacts) {
+        throw new Error("Invalid data structure for comparison received from API.");
+    }
+
+    return parsedData as Omit<Comparison, 'id'>;
+
+  } catch (error) {
+    console.error("Error fetching or parsing comparison from Gemini API:", error);
+    if (error instanceof SyntaxError) {
+      throw new Error("A kapott válasz formátuma hibás volt.");
+    }
+    throw new Error("Nem sikerült lekérni az összehasonlítást a Gemini API-tól.");
   }
 };

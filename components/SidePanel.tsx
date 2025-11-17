@@ -5,6 +5,7 @@ import { DiceIcon } from './icons/DiceIcon';
 import { FeatherIcon } from './icons/FeatherIcon';
 import { TimelineIcon } from './icons/TimelineIcon';
 import { BookOpenIcon } from './icons/BookOpenIcon';
+import { ScaleIcon } from './icons/ScaleIcon';
 
 interface SidePanelProps {
   onSearch: (term: string) => void;
@@ -15,6 +16,7 @@ interface SidePanelProps {
   onExport: () => void;
   isActionDisabled: boolean;
   isExportDisabled: boolean;
+  onCompare: (concept1: string, concept2: string) => void;
 }
 
 export const SidePanel: React.FC<SidePanelProps> = ({ 
@@ -25,10 +27,13 @@ export const SidePanel: React.FC<SidePanelProps> = ({
     journalItemCount,
     onExport, 
     isActionDisabled, 
-    isExportDisabled 
+    isExportDisabled,
+    onCompare
 }) => {
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
   const [timelineTopic, setTimelineTopic] = useState<string>('');
+  const [concept1, setConcept1] = useState<string>('');
+  const [concept2, setConcept2] = useState<string>('');
 
   const handleTopicClick = (topic: string) => {
     setActiveTopic(prev => (prev === topic ? null : topic));
@@ -48,6 +53,15 @@ export const SidePanel: React.FC<SidePanelProps> = ({
       setTimelineTopic('');
     }
   }
+
+  const handleComparisonSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (concept1.trim() && concept2.trim() && !isActionDisabled) {
+      onCompare(concept1.trim(), concept2.trim());
+      setConcept1('');
+      setConcept2('');
+    }
+  };
 
 
   return (
@@ -179,6 +193,38 @@ export const SidePanel: React.FC<SidePanelProps> = ({
             className="px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-purple-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
              <TimelineIcon className="w-5 h-5" />
+          </button>
+        </form>
+      </section>
+
+      {/* Comparison Section */}
+      <section>
+        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">Fogalmak Összehasonlítása</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Hasonlíts össze két történelmi fogalmat, eseményt vagy személyt.</p>
+        <form onSubmit={handleComparisonSubmit} className="space-y-3">
+          <input
+            type="text"
+            value={concept1}
+            onChange={(e) => setConcept1(e.target.value)}
+            placeholder="1. fogalom, pl. 'Jakobinus diktatúra'"
+            disabled={isActionDisabled}
+            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-sm"
+          />
+          <input
+            type="text"
+            value={concept2}
+            onChange={(e) => setConcept2(e.target.value)}
+            placeholder="2. fogalom, pl. 'Sztálini diktatúra'"
+            disabled={isActionDisabled}
+            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all text-sm"
+          />
+          <button
+            type="submit"
+            disabled={isActionDisabled || !concept1.trim() || !concept2.trim()}
+            className="w-full flex items-center justify-center px-4 py-3 bg-cyan-600 text-white font-semibold rounded-lg hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-cyan-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+             <ScaleIcon className="w-5 h-5 mr-2" />
+             Hasonlítsd össze!
           </button>
         </form>
       </section>

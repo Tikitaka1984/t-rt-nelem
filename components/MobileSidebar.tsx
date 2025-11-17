@@ -12,6 +12,7 @@ interface SidePanelProps {
   onExport: () => void;
   isActionDisabled: boolean;
   isExportDisabled: boolean;
+  onCompare: (concept1: string, concept2: string) => void;
 }
 
 export const MobileSidebar: React.FC<SidePanelProps> = (props) => {

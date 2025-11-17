@@ -38,3 +38,14 @@ export interface JournalEntry {
   term: string;
   shortDefinition: string;
 }
+
+export interface Comparison {
+  id:string;
+  concept1: string;
+  concept2: string;
+  similarities: string[];
+  differences: string[];
+  temporalRelations: string;
+  context: string;
+  longTermImpacts: string;
+}
