@@ -16,6 +16,7 @@ import EssayGenerator from './components/EssayGenerator';
 import { ComparisonView } from './components/ComparisonView';
 import { SunIcon } from './components/icons/SunIcon';
 import { MoonIcon } from './components/icons/MoonIcon';
+import { BookOpenIcon } from './components/icons/BookOpenIcon';
 
 type Content =
   | { type: 'initial' }
@@ -220,8 +221,6 @@ const App: React.FC = () => {
       onSearch: handleSearch,
       onShowEssayGenerator: handleShowEssayGenerator,
       onGenerateTimeline: handleGenerateTimeline,
-      onShowJournal: handleShowJournal,
-      journalItemCount: journal.length,
       onExport: handleExport,
       isActionDisabled: content.type === 'loading',
       isExportDisabled: !['article', 'timeline', 'comparison'].includes(content.type),
@@ -231,19 +230,19 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-gray-100 dark:bg-[#1a1a2e] text-gray-900 dark:text-[#e0e0e0] transition-colors duration-300">
-      <header className="relative flex-shrink-0 z-20 bg-white/80 dark:bg-[#0f3460]/80 backdrop-blur-md shadow-sm p-4 border-b border-gray-200 dark:border-[#2a2a4e] transition-colors duration-300">
+    <div className="h-screen w-screen flex flex-col bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+      <header className="relative flex-shrink-0 z-20 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md shadow-sm p-4 border-b border-gray-200 dark:border-slate-800 transition-colors duration-300">
         <div className="absolute top-4 right-4 z-30">
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-full bg-gray-200 dark:bg-[#16213e] text-gray-800 dark:text-[#e0e0e0] hover:bg-gray-300 dark:hover:bg-[#2a2a4e] transition-colors duration-300"
+              className="p-2 rounded-full bg-gray-200 dark:bg-slate-800 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-slate-700 transition-colors duration-300"
               aria-label="Téma váltása"
             >
-              {isDarkMode ? <SunIcon className="w-6 h-6" /> : <MoonIcon className="w-6 h-6" />}
+              {isDarkMode ? <SunIcon className="w-6 h-6 text-amber-500" /> : <MoonIcon className="w-6 h-6 text-cyan-500" />}
             </button>
         </div>
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-[#e0e0e0] mb-4">
+          <h1 className="text-3xl font-bold tracking-tight text-center text-gray-900 dark:text-gray-100 mb-4">
             Történelmi Tudástár+
           </h1>
           <SearchBar 
@@ -254,10 +253,10 @@ const App: React.FC = () => {
             onCancelCompare={() => setComparisonMode({ active: false, item1: '' })}
           />
            {lastViewedConcept && !comparisonMode.active && content.type !== 'initial' && (
-            <div className="text-center mt-3">
+            <div className="text-center mt-4">
               <button 
                 onClick={handleInitiateCompare}
-                className="px-4 py-2 text-sm bg-gray-200 dark:bg-[#16213e] hover:bg-gray-300 dark:hover:bg-[#2a2a4e] rounded-full transition-colors"
+                className="rounded-lg px-4 py-2 font-medium transition-all hover:shadow-md text-sm bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600"
               >
                 Összehasonlítás ezzel: <span className="font-semibold">{lastViewedConcept.title}</span>
               </button>
@@ -267,28 +266,41 @@ const App: React.FC = () => {
       </header>
 
       <div className="flex-grow overflow-y-auto">
-        <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="max-w-7xl mx-auto px-4 py-8">
 
-          <section className="lg:grid lg:grid-cols-[2fr,1fr] lg:gap-6">
+          <section className="lg:grid lg:grid-cols-[1fr,300px] xl:grid-cols-[1fr,350px] lg:gap-8">
             <main className="lg:col-span-1 mb-8 lg:mb-0">
               {renderMainContent()}
             </main>
 
             <aside className="hidden lg:block lg:col-span-1">
-              <div className="sticky top-6">
-                <div className="bg-white dark:bg-[#0f3460] rounded-xl shadow-lg transition-colors duration-300">
-                  <SidePanel onToggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} {...sidePanelProps} />
+              <div className="sticky top-8">
+                <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm">
+                  <SidePanel {...sidePanelProps} />
                 </div>
               </div>
             </aside>
           </section>
           
-          <section className="lg:hidden mt-6">
-             <MobileSidebar onToggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} {...sidePanelProps} />
+          <section className="lg:hidden mt-8">
+             <MobileSidebar {...sidePanelProps} />
           </section>
 
         </div>
       </div>
+      
+      <button
+        onClick={handleShowJournal}
+        className="fixed bottom-6 right-6 z-30 flex items-center justify-center w-16 h-16 bg-amber-500 text-white rounded-full shadow-lg hover:bg-amber-600 hover:scale-105 transition-all duration-300"
+        aria-label="Fogalomnapló megnyitása"
+      >
+        <BookOpenIcon className="w-8 h-8" />
+        {journal.length > 0 && (
+          <span className="absolute -top-1 -right-1 flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-600 rounded-full border-2 border-white dark:border-slate-900">
+            {journal.length}
+          </span>
+        )}
+      </button>
 
       {isExportModalOpen && (content.type === 'article' || content.type === 'timeline' || content.type === 'comparison') && (
         <ExportModal content={content.data} type={content.type} onClose={() => setExportModalOpen(false)} />

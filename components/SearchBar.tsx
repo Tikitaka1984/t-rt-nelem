@@ -41,31 +41,34 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div className="relative w-full max-w-3xl mx-auto">
       <form onSubmit={handleSubmit} className="relative">
+         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <SearchIcon className="w-5 h-5 text-gray-400" />
+        </div>
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={placeholderText}
           disabled={isLoading}
-          className={`w-full px-5 py-3 text-lg bg-gray-50 dark:bg-[#16213e] border rounded-full focus:ring-2 focus:outline-none transition-all duration-300 placeholder-gray-400 dark:placeholder-gray-400 disabled:opacity-50 ${
+          className={`w-full pl-11 pr-16 py-3 text-lg bg-white dark:bg-slate-800 border rounded-lg focus:ring-2 focus:outline-none transition-all duration-300 placeholder-gray-400 dark:placeholder-gray-400 disabled:opacity-50 ${
             isCompareMode 
-            ? 'border-indigo-400 dark:border-[#16c784]' 
-            : 'border-gray-300 dark:border-[#2a2a4e] focus:ring-blue-500 dark:focus:ring-blue-400'
+            ? 'border-cyan-500 focus:border-cyan-500 focus:ring-cyan-200 dark:focus:ring-cyan-500/50' 
+            : 'border-gray-300 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-200 dark:focus:ring-blue-500/50'
           }`}
         />
         <button
           type="submit"
           disabled={isLoading || !query.trim()}
-          className="absolute top-1/2 right-3 -translate-y-1/2 p-2 rounded-full text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-[#16c784] dark:hover:bg-green-500 dark:focus:ring-offset-[#1a1a2e] disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+          className="absolute top-1/2 right-2 -translate-y-1/2 px-4 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-slate-800 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all font-semibold hover:shadow-md"
           aria-label="Keresés"
         >
-          <SearchIcon className="w-6 h-6" />
+          Keresés
         </button>
       </form>
       {isCompareMode && (
         <button
           onClick={onCancelCompare}
-          className="absolute top-1/2 right-16 -translate-y-1/2 p-1.5 rounded-full text-gray-500 dark:text-[#e0e0e0] bg-gray-200 dark:bg-[#2a2a4e] hover:bg-gray-300 dark:hover:bg-[#16c784] transition-colors"
+          className="absolute top-1/2 right-28 -translate-y-1/2 p-1.5 rounded-full text-gray-500 dark:text-gray-300 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
           aria-label="Összehasonlítás megszakítása"
         >
           <CloseIcon className="w-5 h-5" />
