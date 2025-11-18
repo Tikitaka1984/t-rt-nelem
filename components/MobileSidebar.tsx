@@ -13,6 +13,8 @@ interface SidePanelProps {
   isActionDisabled: boolean;
   isExportDisabled: boolean;
   onCompare: (concept1: string, concept2: string) => void;
+  onToggleDarkMode: () => void;
+  isDarkMode: boolean;
 }
 
 export const MobileSidebar: React.FC<SidePanelProps> = (props) => {

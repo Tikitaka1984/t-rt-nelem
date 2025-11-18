@@ -226,6 +226,8 @@ const App: React.FC = () => {
       isActionDisabled: content.type === 'loading',
       isExportDisabled: !['article', 'timeline', 'comparison'].includes(content.type),
       onCompare: handleCompareConcepts,
+      onToggleDarkMode: toggleDarkMode,
+      isDarkMode: isDarkMode,
   };
 
   return (
@@ -275,14 +277,14 @@ const App: React.FC = () => {
             <aside className="hidden lg:block lg:col-span-1">
               <div className="sticky top-6">
                 <div className="bg-white dark:bg-[#0f3460] rounded-xl shadow-lg transition-colors duration-300">
-                  <SidePanel {...sidePanelProps} />
+                  <SidePanel onToggleDarkMode={toggleDarkMode} {...sidePanelProps} />
                 </div>
               </div>
             </aside>
           </section>
           
           <section className="lg:hidden mt-6">
-             <MobileSidebar {...sidePanelProps} />
+             <MobileSidebar onToggleDarkMode={toggleDarkMode} {...sidePanelProps} />
           </section>
 
         </div>

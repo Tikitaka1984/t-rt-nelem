@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { TOPICS, TOP_CONCEPTS } from '../constants';
 import { AccordionItem } from './AccordionItem';
+import { SunIcon } from './icons/SunIcon';
+import { MoonIcon } from './icons/MoonIcon';
 import { DiceIcon } from './icons/DiceIcon';
 import { FeatherIcon } from './icons/FeatherIcon';
 import { TimelineIcon } from './icons/TimelineIcon';
@@ -17,6 +19,8 @@ interface SidePanelProps {
   isActionDisabled: boolean;
   isExportDisabled: boolean;
   onCompare: (concept1: string, concept2: string) => void;
+  onToggleDarkMode: () => void;
+  isDarkMode: boolean;
 }
 
 export const SidePanel: React.FC<SidePanelProps> = ({ 
@@ -28,7 +32,9 @@ export const SidePanel: React.FC<SidePanelProps> = ({
     onExport, 
     isActionDisabled, 
     isExportDisabled,
-    onCompare
+    onCompare,
+    onToggleDarkMode,
+    isDarkMode,
 }) => {
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
   const [timelineTopic, setTimelineTopic] = useState<string>('');
@@ -67,6 +73,19 @@ export const SidePanel: React.FC<SidePanelProps> = ({
 
   return (
     <div className="p-6 space-y-8">
+      {/* Theme Toggle Section */}
+      <section>
+        <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-[#e0e0e0]">Téma váltása</h3>
+        <button
+          onClick={onToggleDarkMode}
+          className="w-full flex items-center justify-between px-4 py-3 bg-gray-200 dark:bg-[#16213e] hover:bg-gray-300 dark:hover:bg-[#2a2a4e] font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#0f3460] focus:ring-blue-500 transition-colors"
+          aria-label="Téma váltása"
+        >
+          <span>{isDarkMode ? 'Világos mód' : 'Sötét mód'}</span>
+          {isDarkMode ? <SunIcon className="w-6 h-6 text-yellow-400" /> : <MoonIcon className="w-6 h-6 text-indigo-400" />}
+        </button>
+      </section>
+
       {/* Témakörök Section */}
       <section>
         <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-[#e0e0e0]">Témakörök</h3>
