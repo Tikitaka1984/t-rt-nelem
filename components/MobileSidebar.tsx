@@ -1,21 +1,6 @@
 import React, { useState } from 'react';
-import { SidePanel } from './SidePanel';
+import { SidePanel, SidePanelProps } from './SidePanel';
 import { ChevronDownIcon } from './icons/ChevronDownIcon';
-
-// Props for MobileSidebar are a subset of SidePanel props, passed from App
-interface SidePanelProps {
-  onSearch: (term: string) => void;
-  onShowEssayGenerator: () => void;
-  onGenerateTimeline: (topic: string) => void;
-  onShowJournal: () => void;
-  journalItemCount: number;
-  onExport: () => void;
-  isActionDisabled: boolean;
-  isExportDisabled: boolean;
-  onCompare: (concept1: string, concept2: string) => void;
-  onToggleDarkMode: () => void;
-  isDarkMode: boolean;
-}
 
 export const MobileSidebar: React.FC<SidePanelProps> = (props) => {
   const [isOpen, setIsOpen] = useState(false);

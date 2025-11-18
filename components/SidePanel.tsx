@@ -9,7 +9,7 @@ import { TimelineIcon } from './icons/TimelineIcon';
 import { BookOpenIcon } from './icons/BookOpenIcon';
 import { ScaleIcon } from './icons/ScaleIcon';
 
-interface SidePanelProps {
+export interface SidePanelProps {
   onSearch: (term: string) => void;
   onShowEssayGenerator: () => void;
   onGenerateTimeline: (topic: string) => void;
@@ -47,7 +47,6 @@ export const SidePanel: React.FC<SidePanelProps> = ({
   
   const handleRandomConcept = () => {
     if (isActionDisabled) return;
-    // FIX: Corrected typo from TOP_CONCEPts to TOP_CONCEPTS.
     const allConcepts = TOP_CONCEPTS.flatMap(group => group.concepts);
     const randomConcept = allConcepts[Math.floor(Math.random() * allConcepts.length)];
     onSearch(randomConcept);

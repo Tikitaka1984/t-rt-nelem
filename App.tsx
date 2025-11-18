@@ -6,7 +6,7 @@ import { ArticleView } from './components/ArticleView';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { HistoryIcon } from './components/icons/HistoryIcon';
 import { SidePanel } from './components/SidePanel';
-import { ExportModal } from './components/ExportModal';
+import { ExportModal } from './ExportModal';
 import { TimelineView } from './components/TimelineView';
 import { EventDetailView } from './components/EventDetailView';
 import { JournalModal } from './components/JournalModal';
@@ -103,7 +103,7 @@ const App: React.FC = () => {
       setContent({ type: 'error', message: 'Hiba történt a fogalom keresése közben. Kérjük, próbálja újra.' });
       console.error(err);
     }
-  }, [content, comparisonMode]);
+  }, [content, comparisonMode, handleCompareConcepts]);
   
   const handleShowEssayGenerator = useCallback(() => {
     setContent({ type: 'essayGenerator' });
@@ -277,14 +277,14 @@ const App: React.FC = () => {
             <aside className="hidden lg:block lg:col-span-1">
               <div className="sticky top-6">
                 <div className="bg-white dark:bg-[#0f3460] rounded-xl shadow-lg transition-colors duration-300">
-                  <SidePanel onToggleDarkMode={toggleDarkMode} {...sidePanelProps} />
+                  <SidePanel onToggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} {...sidePanelProps} />
                 </div>
               </div>
             </aside>
           </section>
           
           <section className="lg:hidden mt-6">
-             <MobileSidebar onToggleDarkMode={toggleDarkMode} {...sidePanelProps} />
+             <MobileSidebar onToggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} {...sidePanelProps} />
           </section>
 
         </div>
