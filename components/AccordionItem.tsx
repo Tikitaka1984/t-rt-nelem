@@ -11,25 +11,25 @@ export const AccordionItem: React.FC<AccordionItemProps> = ({ title, children })
   const panelId = useId();
 
   return (
-    <div className="border border-gray-200 dark:border-[#2a2a4e] rounded-lg transition-colors duration-300">
+    <div className="border-b border-gray-100 dark:border-slate-800 last:border-0 transition-colors duration-300">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex justify-between items-center p-3 text-left font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-[#16213e]/50 hover:bg-gray-100 dark:hover:bg-[#16213e] transition-colors"
+        className="w-full flex justify-between items-center py-3 text-left font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors group"
         aria-expanded={isOpen}
         aria-controls={panelId}
       >
-        <span>{title}</span>
+        <span className="text-sm group-hover:pl-1 transition-all duration-200">{title}</span>
         <ChevronDownIcon
-          className={`w-5 h-5 transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 text-gray-400 group-hover:text-blue-500 transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
       <div
         id={panelId}
         className={`overflow-hidden transition-all duration-300 ease-in-out ${
-          isOpen ? 'max-h-96' : 'max-h-0'
+          isOpen ? 'max-h-96 opacity-100 pb-3' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="p-3 bg-white dark:bg-[#0f3460] transition-colors duration-300">
+        <div className="pl-2 border-l-2 border-gray-100 dark:border-slate-800 ml-1">
           {children}
         </div>
       </div>

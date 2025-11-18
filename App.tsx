@@ -38,6 +38,7 @@ const App: React.FC = () => {
   const [lastViewedConcept, setLastViewedConcept] = useState<{ title: string } | null>(null);
   const [comparisonMode, setComparisonMode] = useState<{ active: boolean; item1: string }>({ active: false, item1: '' });
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
+  const [isThemeRotating, setIsThemeRotating] = useState(false);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -50,7 +51,9 @@ const App: React.FC = () => {
   }, [isDarkMode]);
 
   const toggleDarkMode = () => {
+    setIsThemeRotating(true);
     setIsDarkMode(!isDarkMode);
+    setTimeout(() => setIsThemeRotating(false), 500); // Reset rotation after animation
   };
 
   useEffect(() => {
@@ -185,11 +188,13 @@ const App: React.FC = () => {
     switch (content.type) {
       case 'initial':
         return (
-          <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400 p-8 min-h-[50vh]">
-            <HistoryIcon className="w-24 h-24 mb-4" />
-            <h2 className="text-2xl font-semibold">Üdv a Történelmi Tudástár+ felületén!</h2>
-            <p className="max-w-md mt-2">
-              Kezdje a tanulást egy fogalom beírásával a fenti keresőmezőbe, vagy használja a jobb oldali menü eszközeit.
+          <div className="flex flex-col items-center justify-center h-full text-center p-8 min-h-[50vh] animate-fade-in">
+             <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                <HistoryIcon className="w-12 h-12 text-blue-600 dark:text-blue-400" />
+             </div>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3 font-serif">Üdv a Történelmi Tudástár+ felületén!</h2>
+            <p className="max-w-md text-gray-600 dark:text-gray-400 leading-relaxed">
+              Kezdje a tanulást egy fogalom beírásával a fenti keresőmezőbe, vagy használja a jobb oldali menü eszközeit a felfedezéshez.
             </p>
           </div>
         );
@@ -197,9 +202,9 @@ const App: React.FC = () => {
         return <div className="flex items-center justify-center h-full min-h-[50vh]"><LoadingSpinner message={content.message} /></div>;
       case 'error':
         return (
-          <div className="p-8 h-full flex items-center justify-center min-h-[50vh]">
-            <div className="p-6 bg-red-100 dark:bg-red-900/50 border border-red-400 dark:border-red-700 rounded-lg shadow-lg text-red-800 dark:text-red-200">
-              <h3 className="font-bold mb-2">Hiba!</h3>
+          <div className="p-8 h-full flex items-center justify-center min-h-[50vh] animate-fade-in">
+            <div className="p-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-r-lg shadow-lg text-red-800 dark:text-red-200 max-w-md">
+              <h3 className="font-bold text-lg mb-2">Hiba történt</h3>
               <p>{content.message}</p>
             </div>
           </div>
@@ -230,21 +235,35 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-      <header className="relative flex-shrink-0 z-20 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md shadow-sm p-4 border-b border-gray-200 dark:border-slate-800 transition-colors duration-300">
+    <div className="h-screen w-screen flex flex-col bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 transition-colors duration-300 font-sans">
+      {/* Hero / Header Section with Gradient */}
+      <header className="relative flex-shrink-0 z-20 bg-white/80 dark:bg-slate-950/90 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 transition-colors duration-300">
+        {/* Subtle Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 via-transparent to-cyan-50/50 dark:from-blue-900/10 dark:to-cyan-900/10 pointer-events-none"></div>
+        
         <div className="absolute top-4 right-4 z-30">
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-full bg-gray-200 dark:bg-slate-800 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-slate-700 transition-colors duration-300"
+              className={`p-2.5 rounded-full bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700 transition-all duration-500 shadow-sm hover:shadow-md ${isThemeRotating ? 'rotate-180' : ''}`}
               aria-label="Téma váltása"
             >
-              {isDarkMode ? <SunIcon className="w-6 h-6 text-amber-500" /> : <MoonIcon className="w-6 h-6 text-cyan-500" />}
+              {isDarkMode ? <SunIcon className="w-5 h-5 text-amber-400" /> : <MoonIcon className="w-5 h-5 text-blue-600" />}
             </button>
         </div>
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold tracking-tight text-center text-gray-900 dark:text-gray-100 mb-4">
-            Történelmi Tudástár+
-          </h1>
+        
+        <div className="max-w-7xl mx-auto px-4 py-8 relative">
+          <div className="text-center mb-6">
+             <div className="inline-flex items-center justify-center gap-3 mb-2">
+                <div className="w-3 h-3 rounded-full bg-cyan-500 animate-pulse"></div>
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 font-serif">
+                  Történelmi Tudástár<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">+</span>
+                </h1>
+             </div>
+             <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 font-medium tracking-wide uppercase">
+               Interaktív érettségi felkészítő
+             </p>
+          </div>
+
           <SearchBar 
             onSearch={handleSearch} 
             isLoading={content.type === 'loading'}
@@ -252,30 +271,33 @@ const App: React.FC = () => {
             item1Title={comparisonMode.item1}
             onCancelCompare={() => setComparisonMode({ active: false, item1: '' })}
           />
+          
            {lastViewedConcept && !comparisonMode.active && content.type !== 'initial' && (
-            <div className="text-center mt-4">
+            <div className="text-center mt-5 animate-fade-in">
               <button 
                 onClick={handleInitiateCompare}
-                className="rounded-lg px-4 py-2 font-medium transition-all hover:shadow-md text-sm bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600"
+                className="group relative inline-flex items-center justify-center px-6 py-2 text-sm font-medium text-blue-700 dark:text-blue-300 transition-all duration-200 bg-blue-50 dark:bg-blue-900/20 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/40 hover:shadow-sm border border-blue-100 dark:border-blue-800"
               >
-                Összehasonlítás ezzel: <span className="font-semibold">{lastViewedConcept.title}</span>
+                <span>Összehasonlítás ezzel:</span>
+                <span className="ml-1.5 font-bold">{lastViewedConcept.title}</span>
+                <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-blue-500">→</span>
               </button>
             </div>
           )}
         </div>
       </header>
 
-      <div className="flex-grow overflow-y-auto">
+      <div className="flex-grow overflow-y-auto custom-scrollbar">
         <div className="max-w-7xl mx-auto px-4 py-8">
 
-          <section className="lg:grid lg:grid-cols-[1fr,300px] xl:grid-cols-[1fr,350px] lg:gap-8">
-            <main className="lg:col-span-1 mb-8 lg:mb-0">
+          <section className="lg:grid lg:grid-cols-[1fr,320px] xl:grid-cols-[1fr,360px] lg:gap-8">
+            <main className="lg:col-span-1 mb-8 lg:mb-0 min-h-[400px]">
               {renderMainContent()}
             </main>
 
             <aside className="hidden lg:block lg:col-span-1">
               <div className="sticky top-8">
-                <div className="bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm">
+                <div className="bg-white dark:bg-slate-900/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden">
                   <SidePanel {...sidePanelProps} />
                 </div>
               </div>
@@ -289,15 +311,19 @@ const App: React.FC = () => {
         </div>
       </div>
       
+      {/* Floating Journal Button */}
       <button
         onClick={handleShowJournal}
-        className="fixed bottom-6 right-6 z-30 flex items-center justify-center w-16 h-16 bg-amber-500 text-white rounded-full shadow-lg hover:bg-amber-600 hover:scale-105 transition-all duration-300"
+        className="fixed bottom-8 right-8 z-40 group flex items-center justify-center w-14 h-14 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-full shadow-xl hover:shadow-2xl hover:scale-110 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-orange-300 dark:focus:ring-orange-900"
         aria-label="Fogalomnapló megnyitása"
       >
-        <BookOpenIcon className="w-8 h-8" />
+        <BookOpenIcon className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" />
         {journal.length > 0 && (
-          <span className="absolute -top-1 -right-1 flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-600 rounded-full border-2 border-white dark:border-slate-900">
-            {journal.length}
+           <span className="absolute -top-1 -right-1 flex h-5 w-5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-5 w-5 bg-red-600 border-2 border-white dark:border-slate-900 items-center justify-center text-[10px] font-bold text-white">
+               {journal.length}
+            </span>
           </span>
         )}
       </button>
@@ -309,6 +335,24 @@ const App: React.FC = () => {
         <JournalModal journal={journal} onClose={() => setJournalModalOpen(false)} />
       )}
       {toastMessage && <Toast message={toastMessage} />}
+      
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background-color: rgba(156, 163, 175, 0.5);
+          border-radius: 20px;
+          border: 3px solid transparent;
+          background-clip: content-box;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(107, 114, 128, 0.8);
+        }
+      `}</style>
     </div>
   );
 };

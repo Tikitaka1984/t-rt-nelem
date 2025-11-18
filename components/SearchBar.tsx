@@ -18,6 +18,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onCancelCompare 
 }) => {
   const [query, setQuery] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
     // Clear query when entering compare mode
@@ -39,41 +40,52 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     : "Keress egy történelmi fogalmat...";
 
   return (
-    <div className="relative w-full max-w-3xl mx-auto">
-      <form onSubmit={handleSubmit} className="relative">
-         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <SearchIcon className="w-5 h-5 text-gray-400" />
+    <div className={`relative w-full max-w-3xl mx-auto transition-all duration-300 ${isFocused ? 'scale-[1.02]' : 'scale-100'}`}>
+      <form onSubmit={handleSubmit} className="relative group">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-xl blur opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
+        
+        <div className="relative flex items-center">
+            <div className="absolute left-0 pl-4 flex items-center pointer-events-none">
+                <SearchIcon className={`w-5 h-5 transition-colors duration-300 ${isFocused ? 'text-blue-500' : 'text-gray-400'}`} />
+            </div>
+            <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            placeholder={placeholderText}
+            disabled={isLoading}
+            className={`w-full pl-12 pr-24 py-4 text-lg bg-white dark:bg-slate-900 border rounded-xl shadow-sm transition-all duration-300 placeholder-gray-400 dark:placeholder-gray-500 disabled:opacity-50 ${
+                isCompareMode 
+                ? 'border-cyan-300 dark:border-cyan-700 focus:ring-4 focus:ring-cyan-100 dark:focus:ring-cyan-900/30' 
+                : 'border-gray-200 dark:border-slate-700 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30'
+            }`}
+            />
+            
+            <div className="absolute right-2 flex items-center gap-2">
+                 {isCompareMode && (
+                    <button
+                    type="button"
+                    onClick={onCancelCompare}
+                    className="p-2 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    aria-label="Összehasonlítás megszakítása"
+                    >
+                    <CloseIcon className="w-5 h-5" />
+                    </button>
+                )}
+                
+                <button
+                type="submit"
+                disabled={isLoading || !query.trim()}
+                className="px-5 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 font-medium shadow-md hover:shadow-lg active:scale-95 transition-all disabled:bg-gray-300 dark:disabled:bg-slate-700 disabled:cursor-not-allowed disabled:shadow-none"
+                aria-label="Keresés"
+                >
+                Keresés
+                </button>
+            </div>
         </div>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={placeholderText}
-          disabled={isLoading}
-          className={`w-full pl-11 pr-16 py-3 text-lg bg-white dark:bg-slate-800 border rounded-lg focus:ring-2 focus:outline-none transition-all duration-300 placeholder-gray-400 dark:placeholder-gray-400 disabled:opacity-50 ${
-            isCompareMode 
-            ? 'border-cyan-500 focus:border-cyan-500 focus:ring-cyan-200 dark:focus:ring-cyan-500/50' 
-            : 'border-gray-300 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-200 dark:focus:ring-blue-500/50'
-          }`}
-        />
-        <button
-          type="submit"
-          disabled={isLoading || !query.trim()}
-          className="absolute top-1/2 right-2 -translate-y-1/2 px-4 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-slate-800 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all font-semibold hover:shadow-md"
-          aria-label="Keresés"
-        >
-          Keresés
-        </button>
       </form>
-      {isCompareMode && (
-        <button
-          onClick={onCancelCompare}
-          className="absolute top-1/2 right-28 -translate-y-1/2 p-1.5 rounded-full text-gray-500 dark:text-gray-300 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
-          aria-label="Összehasonlítás megszakítása"
-        >
-          <CloseIcon className="w-5 h-5" />
-        </button>
-      )}
     </div>
   );
 };
