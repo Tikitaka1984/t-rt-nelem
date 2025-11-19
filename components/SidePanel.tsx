@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { TOPICS, TOP_CONCEPTS } from '../constants';
 import { AccordionItem } from './AccordionItem';
@@ -6,18 +7,20 @@ import { FeatherIcon } from './icons/FeatherIcon';
 import { TimelineIcon } from './icons/TimelineIcon';
 import { ScaleIcon } from './icons/ScaleIcon';
 import { DownloadIcon } from './icons/DownloadIcon';
-import { CheckIcon } from './icons/CheckIcon';
+import { GamepadIcon } from './icons/GamepadIcon';
 
 export interface SidePanelProps {
   onSearch: (term: string) => void;
   onShowEssayGenerator: () => void;
   onGenerateTimeline: (topic: string) => void;
+  onShowGameHub: () => void; // New Prop
   onExport: () => void;
   isActionDisabled: boolean;
   isExportDisabled: boolean;
   onCompare: (concept1: string, concept2: string) => void;
   onToggleDarkMode: () => void;
   isDarkMode: boolean;
+  userPoints: number; // New Prop
 }
 
 const getTopicColorClass = (topic: string): string => {
@@ -33,12 +36,14 @@ export const SidePanel: React.FC<SidePanelProps> = ({
     onSearch, 
     onShowEssayGenerator, 
     onGenerateTimeline, 
+    onShowGameHub,
     onExport, 
     isActionDisabled, 
     isExportDisabled,
     onCompare,
-    onToggleDarkMode, // Kept in props for compatibility, though moved to App header
+    onToggleDarkMode, 
     isDarkMode,
+    userPoints,
 }) => {
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
   const [timelineTopic, setTimelineTopic] = useState<string>('');
@@ -162,6 +167,28 @@ export const SidePanel: React.FC<SidePanelProps> = ({
           </div>
           
           <div className="space-y-4">
+
+            {/* GAME BUTTON (FEATURED) */}
+            <button 
+                onClick={onShowGameHub}
+                disabled={isActionDisabled}
+                className="w-full relative overflow-hidden p-4 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all group text-left"
+            >
+                 <div className="absolute top-0 right-0 w-20 h-20 bg-white opacity-10 rounded-full -mr-10 -mt-10"></div>
+                 <div className="flex items-center justify-between relative z-10">
+                    <div>
+                        <h4 className="font-bold text-lg">Játékzóna</h4>
+                        <p className="text-xs text-violet-100 opacity-90">Missziók & Kvíz</p>
+                    </div>
+                    <GamepadIcon className="w-8 h-8 text-white opacity-90 group-hover:rotate-12 transition-transform" />
+                 </div>
+                 {userPoints > 0 && (
+                    <div className="mt-2 inline-block px-2 py-0.5 bg-black/20 rounded text-xs font-mono">
+                        🏆 Pontjaid: {userPoints}
+                    </div>
+                 )}
+            </button>
+
             {/* Comparison Tool */}
             <div className="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700">
                 <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">

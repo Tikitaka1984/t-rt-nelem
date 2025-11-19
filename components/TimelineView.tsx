@@ -1,13 +1,29 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { TimelineEvent } from '../types';
+import { BookPlusIcon } from './icons/BookPlusIcon';
 
 interface TimelineViewProps {
   topic: string;
   events: TimelineEvent[];
   onEventClick: (eventName: string) => void;
+  onAddToJournal: (term: string, definition: string) => void;
 }
 
-export const TimelineView: React.FC<TimelineViewProps> = ({ topic, events, onEventClick }) => {
+export const TimelineView: React.FC<TimelineViewProps> = ({ topic, events, onEventClick, onAddToJournal }) => {
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleAddToJournalClick = () => {
+    setIsAdding(true);
+    const term = `Idővonal: ${topic}`;
+    const dateRange = events.length > 0 ? `${events[0].date} - ${events[events.length - 1].date}` : '';
+    const definition = `Idővonal (${events.length} esemény). Időszak: ${dateRange}. Kulcsesemények: ${events.slice(0, 3).map(e => e.title).join(', ')}...`;
+    
+    onAddToJournal(term, definition);
+    
+    setTimeout(() => setIsAdding(false), 1000);
+  };
+
   return (
     <div className="h-full p-1 lg:p-4 animate-fade-in overflow-y-auto custom-scrollbar">
       <div className="max-w-4xl mx-auto pb-12">
@@ -63,6 +79,18 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ topic, events, onEve
             </div>
           ))}
         </div>
+
+        <div className="p-6 bg-gray-50 dark:bg-slate-900/50 border-t border-gray-100 dark:border-slate-800 rounded-xl mt-8">
+            <button
+                onClick={handleAddToJournalClick}
+                disabled={isAdding}
+                className="w-full flex items-center justify-center px-6 py-3 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-200 font-semibold rounded-xl border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 hover:border-amber-400 dark:hover:border-amber-500 hover:text-amber-600 dark:hover:text-amber-400 shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+            >
+                <BookPlusIcon className="w-5 h-5 mr-2 text-amber-500 group-hover:scale-110 transition-transform" />
+                {isAdding ? 'Mentés...' : 'Idővonal mentése a fogalomnaplóba'}
+            </button>
+        </div>
+
       </div>
        <style>{`
             @keyframes fade-in {

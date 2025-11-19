@@ -1,5 +1,7 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { Article, EventDetail, TimelineEvent, JournalEntry, ComparisonData } from './types';
+import { UserProgress } from './types/gamification';
 import { fetchConcept, fetchTimelineEvents, fetchEventDetail, fetchShortDefinition, fetchComparison } from './services/geminiService';
 import { SearchBar } from './components/SearchBar';
 import { ArticleView } from './components/ArticleView';
@@ -17,6 +19,7 @@ import { ComparisonView } from './components/ComparisonView';
 import { SunIcon } from './components/icons/SunIcon';
 import { MoonIcon } from './components/icons/MoonIcon';
 import { BookOpenIcon } from './components/icons/BookOpenIcon';
+import { GameHub } from './components/gamification/GameHub';
 
 type Content =
   | { type: 'initial' }
@@ -26,7 +29,8 @@ type Content =
   | { type: 'essayGenerator' }
   | { type: 'timeline', data: { topic: string, events: TimelineEvent[] } }
   | { type: 'eventDetail', data: EventDetail }
-  | { type: 'comparison', data: ComparisonData };
+  | { type: 'comparison', data: ComparisonData }
+  | { type: 'game' };
 
 
 const App: React.FC = () => {
@@ -39,6 +43,14 @@ const App: React.FC = () => {
   const [comparisonMode, setComparisonMode] = useState<{ active: boolean; item1: string }>({ active: false, item1: '' });
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
   const [isThemeRotating, setIsThemeRotating] = useState(false);
+  
+  // Gamification State
+  const [userProgress, setUserProgress] = useState<UserProgress>({
+    totalPoints: 0,
+    completedQuestIds: [],
+    earnedBadgeIds: [],
+    detectiveStreak: 0,
+  });
 
   useEffect(() => {
     if (isDarkMode) {
@@ -112,6 +124,10 @@ const App: React.FC = () => {
   const handleShowEssayGenerator = useCallback(() => {
     setContent({ type: 'essayGenerator' });
   }, []);
+  
+  const handleShowGameHub = useCallback(() => {
+    setContent({ type: 'game' });
+  }, []);
 
   const handleGenerateTimeline = useCallback(async (topic: string) => {
     if (content.type === 'loading') return;
@@ -148,6 +164,7 @@ const App: React.FC = () => {
     }
   }, [content]);
 
+  // Original handler for searching and adding a term
   const handleAddToJournal = useCallback(async (term: string) => {
     if (journal.some(entry => entry.term.toLowerCase() === term.toLowerCase())) {
         setToastMessage(`"${term}" már szerepel a fogalomnaplódban.`);
@@ -158,7 +175,7 @@ const App: React.FC = () => {
         const newEntry: JournalEntry = { term, shortDefinition };
         setJournal(prev => {
             const newJournal = [...prev, newEntry];
-            setToastMessage(`A fogalom bekerült a naplódból. Jelenlegi elemek: ${newJournal.length}.`);
+            setToastMessage(`A fogalom bekerült a naplóba.`);
             return newJournal;
         });
     } catch (error) {
@@ -166,6 +183,17 @@ const App: React.FC = () => {
         setToastMessage("Hiba történt a fogalom hozzáadása közben.");
     }
 }, [journal]);
+
+  // New handler for saving generated content (Timeline, Essay, Comparison)
+  const handleSaveToJournal = useCallback((term: string, definition: string) => {
+      if (journal.some(entry => entry.term === term)) {
+          setToastMessage(`Ez a bejegyzés már szerepel a naplóban.`);
+          return;
+      }
+      const newEntry: JournalEntry = { term, shortDefinition: definition };
+      setJournal(prev => [...prev, newEntry]);
+      setToastMessage("Sikeresen mentve a fogalomnaplóba!");
+  }, [journal]);
 
   const handleShowJournal = () => {
       setJournalModalOpen(true);
@@ -182,6 +210,19 @@ const App: React.FC = () => {
       setComparisonMode({ active: true, item1: lastViewedConcept.title });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  };
+  
+  const handleUpdateProgress = (newProgress: UserProgress) => {
+    // Add specific toast if points increased
+    if (newProgress.totalPoints > userProgress.totalPoints) {
+        const diff = newProgress.totalPoints - userProgress.totalPoints;
+        setToastMessage(`Gratulálunk! +${diff} pontot szereztél!`);
+    }
+    // Add toast for badge
+    if (newProgress.earnedBadgeIds.length > userProgress.earnedBadgeIds.length) {
+        setToastMessage("Új kitűzőt szereztél! Nézd meg a Játékzónában!");
+    }
+    setUserProgress(newProgress);
   };
 
   const renderMainContent = () => {
@@ -212,19 +253,22 @@ const App: React.FC = () => {
       case 'article':
         return <ArticleView key={content.data.id} article={content.data} onTermClick={handleSearch} onAddToJournal={handleAddToJournal} />;
       case 'essayGenerator':
-        return <EssayGenerator />;
+        return <EssayGenerator onAddToJournal={handleSaveToJournal} />;
       case 'timeline':
-        return <TimelineView topic={content.data.topic} events={content.data.events} onEventClick={handleEventClick} />;
+        return <TimelineView topic={content.data.topic} events={content.data.events} onEventClick={handleEventClick} onAddToJournal={handleSaveToJournal} />;
       case 'eventDetail':
         return <EventDetailView key={content.data.id} eventDetail={content.data} onTermClick={handleSearch} onAddToJournal={handleAddToJournal} />;
       case 'comparison':
-        return <ComparisonView key={content.data.id} comparison={content.data} />;
+        return <ComparisonView key={content.data.id} comparison={content.data} onAddToJournal={handleSaveToJournal} />;
+      case 'game':
+        return <GameHub userProgress={userProgress} onUpdateProgress={handleUpdateProgress} />;
     }
   };
   
   const sidePanelProps = {
       onSearch: handleSearch,
       onShowEssayGenerator: handleShowEssayGenerator,
+      onShowGameHub: handleShowGameHub,
       onGenerateTimeline: handleGenerateTimeline,
       onExport: handleExport,
       isActionDisabled: content.type === 'loading',
@@ -232,6 +276,7 @@ const App: React.FC = () => {
       onCompare: handleCompareConcepts,
       onToggleDarkMode: toggleDarkMode,
       isDarkMode: isDarkMode,
+      userPoints: userProgress.totalPoints,
   };
 
   return (
@@ -272,7 +317,7 @@ const App: React.FC = () => {
             onCancelCompare={() => setComparisonMode({ active: false, item1: '' })}
           />
           
-           {lastViewedConcept && !comparisonMode.active && content.type !== 'initial' && (
+           {lastViewedConcept && !comparisonMode.active && content.type !== 'initial' && content.type !== 'game' && (
             <div className="text-center mt-5 animate-fade-in">
               <button 
                 onClick={handleInitiateCompare}

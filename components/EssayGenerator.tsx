@@ -1,13 +1,20 @@
+
 import React, { useState } from "react";
 import { generateEssay } from "../services/essayService";
+import { BookPlusIcon } from "./icons/BookPlusIcon";
 
-export default function EssayGenerator() {
+interface EssayGeneratorProps {
+    onAddToJournal: (term: string, definition: string) => void;
+}
+
+export default function EssayGenerator({ onAddToJournal }: EssayGeneratorProps) {
   const [topic, setTopic] = useState("");
   const [level, setLevel] = useState("kozep");
   const [style, setStyle] = useState("tomor");
   const [mode, setMode] = useState("vazlat"); 
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
 
   const handleGenerate = async () => {
     if (!topic.trim()) return;
@@ -22,6 +29,18 @@ export default function EssayGenerator() {
     } finally {
         setLoading(false);
     }
+  };
+
+  const handleAddToJournalClick = () => {
+    if (!result) return;
+    setIsAdding(true);
+    const term = `Esszé: ${topic}`;
+    // Create a summary for the definition field
+    const summary = `Típus: ${level}, ${mode}. ${result.substring(0, 150)}${result.length > 150 ? '...' : ''}`;
+    
+    onAddToJournal(term, summary);
+    
+    setTimeout(() => setIsAdding(false), 1000);
   };
 
   return (
@@ -94,8 +113,19 @@ export default function EssayGenerator() {
       {result && (
         <div className="mt-6 p-6 bg-gray-100 dark:bg-[#1a1a2e]/50 rounded-2xl whitespace-pre-line">
           <h3 className="text-xl font-bold mb-4 border-b pb-2 dark:border-[#2a2a4e]">Generált eredmény:</h3>
-          <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none">
+          <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none mb-8">
             {result}
+          </div>
+          
+          <div className="pt-4 border-t border-gray-200 dark:border-slate-700">
+              <button
+                onClick={handleAddToJournalClick}
+                disabled={isAdding}
+                className="w-full flex items-center justify-center px-6 py-3 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-200 font-semibold rounded-xl border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 hover:border-amber-400 dark:hover:border-amber-500 hover:text-amber-600 dark:hover:text-amber-400 shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+            >
+                <BookPlusIcon className="w-5 h-5 mr-2 text-amber-500 group-hover:scale-110 transition-transform" />
+                {isAdding ? 'Mentés...' : 'Esszé mentése a fogalomnaplóba'}
+            </button>
           </div>
         </div>
       )}

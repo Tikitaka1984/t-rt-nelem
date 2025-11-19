@@ -1,6 +1,8 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { ComparisonData } from '../types';
 import { ArrowRightIcon } from './icons/ArrowRightIcon';
+import { BookPlusIcon } from './icons/BookPlusIcon';
 
 const ItemCard: React.FC<{ item: ComparisonData['item1'], bgColor: string, darkBgColor: string, darkBorderColor: string }> = ({ item, bgColor, darkBgColor, darkBorderColor }) => (
     <div className={`p-6 rounded-2xl shadow-lg ${bgColor} ${darkBgColor} h-full flex flex-col border ${darkBorderColor} transition-colors duration-300`}>
@@ -20,7 +22,24 @@ const Section: React.FC<{ title: string, children: React.ReactNode, className?: 
     </div>
 );
 
-export const ComparisonView: React.FC<{ comparison: ComparisonData }> = ({ comparison }) => {
+interface ComparisonViewProps {
+    comparison: ComparisonData;
+    onAddToJournal: (term: string, definition: string) => void;
+}
+
+export const ComparisonView: React.FC<ComparisonViewProps> = ({ comparison, onAddToJournal }) => {
+    const [isAdding, setIsAdding] = useState(false);
+
+    const handleAddToJournalClick = () => {
+        setIsAdding(true);
+        const term = `Összehasonlítás: ${comparison.item1.title} vs ${comparison.item2.title}`;
+        const definition = `Összehasonlítás. Hasonlóságok: ${comparison.similarities.length} db, Különbségek: ${comparison.differences.length} db. Kapcsolat: ${comparison.temporalRelation}`;
+        
+        onAddToJournal(term, definition);
+        
+        setTimeout(() => setIsAdding(false), 1000);
+    };
+
     return (
         <div className="p-2 sm:p-4 md:p-6 animate-fade-in space-y-8">
              <div className="text-center">
@@ -66,6 +85,18 @@ export const ComparisonView: React.FC<{ comparison: ComparisonData }> = ({ compa
                     </div>
                 </div>
             </Section>
+            
+            <div className="p-6 bg-gray-50 dark:bg-slate-900/50 border-t border-gray-100 dark:border-slate-800 rounded-xl">
+                <button
+                    onClick={handleAddToJournalClick}
+                    disabled={isAdding}
+                    className="w-full flex items-center justify-center px-6 py-3 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-200 font-semibold rounded-xl border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 hover:border-amber-400 dark:hover:border-amber-500 hover:text-amber-600 dark:hover:text-amber-400 shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                >
+                    <BookPlusIcon className="w-5 h-5 mr-2 text-amber-500 group-hover:scale-110 transition-transform" />
+                    {isAdding ? 'Mentés...' : 'Összehasonlítás mentése a fogalomnaplóba'}
+                </button>
+            </div>
+
             <style>{`
                 @keyframes fade-in {
                     from { opacity: 0; transform: translateY(10px); }
