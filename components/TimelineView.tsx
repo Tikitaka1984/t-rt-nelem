@@ -8,9 +8,10 @@ interface TimelineViewProps {
   events: TimelineEvent[];
   onEventClick: (eventName: string) => void;
   onAddToJournal: (term: string, definition: string) => void;
+  onDateClick: (date: string) => void;
 }
 
-export const TimelineView: React.FC<TimelineViewProps> = ({ topic, events, onEventClick, onAddToJournal }) => {
+export const TimelineView: React.FC<TimelineViewProps> = ({ topic, events, onEventClick, onAddToJournal, onDateClick }) => {
   const [isAdding, setIsAdding] = useState(false);
 
   const handleAddToJournalClick = () => {
@@ -43,7 +44,13 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ topic, events, onEve
               <div className={`w-full md:w-5/12 pl-12 md:pl-0 ${index % 2 === 0 ? 'md:order-1 md:text-right' : 'md:order-3'}`}>
                  {index % 2 === 0 && (
                     <div className="hidden md:block">
-                       <span className="text-3xl font-black text-purple-200 dark:text-purple-900/50 select-none absolute -top-4 right-0 opacity-50 group-hover:opacity-100 transition-opacity">{event.date}</span>
+                       <button 
+                        onClick={() => onDateClick(event.date)}
+                        className="text-3xl font-black text-purple-200 dark:text-purple-900/50 absolute -top-4 right-0 opacity-50 group-hover:opacity-100 transition-all hover:text-purple-400 dark:hover:text-purple-600 cursor-pointer z-0"
+                        title="Keresés erre a dátumra"
+                       >
+                        {event.date}
+                       </button>
                        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 relative z-10">{event.title}</h3>
                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">{event.description}</p>
                        <button onClick={() => onEventClick(event.title)} className="mt-2 text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline">Részletek &rarr;</button>
@@ -60,7 +67,12 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ topic, events, onEve
               <div className={`w-full md:w-5/12 pl-12 md:pl-0 ${index % 2 === 0 ? 'md:order-3' : 'md:order-1'}`}>
                   {/* Mobile View (Always shows content) */}
                   <div className="md:hidden">
-                        <span className="text-sm font-bold text-purple-600 dark:text-purple-400 block mb-1">{event.date}</span>
+                        <button 
+                          onClick={() => onDateClick(event.date)}
+                          className="text-sm font-bold text-purple-600 dark:text-purple-400 block mb-1 hover:underline text-left"
+                        >
+                          {event.date}
+                        </button>
                         <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">{event.title}</h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">{event.description}</p>
                          <button onClick={() => onEventClick(event.title)} className="mt-2 text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline">Részletek &rarr;</button>
@@ -69,7 +81,13 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ topic, events, onEve
                    {/* Desktop View (Right side content for odd items) */}
                   {index % 2 !== 0 && (
                     <div className="hidden md:block text-left">
-                       <span className="text-3xl font-black text-purple-200 dark:text-purple-900/50 select-none absolute -top-4 left-0 opacity-50 group-hover:opacity-100 transition-opacity">{event.date}</span>
+                       <button 
+                        onClick={() => onDateClick(event.date)}
+                        className="text-3xl font-black text-purple-200 dark:text-purple-900/50 absolute -top-4 left-0 opacity-50 group-hover:opacity-100 transition-all hover:text-purple-400 dark:hover:text-purple-600 cursor-pointer z-0"
+                        title="Keresés erre a dátumra"
+                       >
+                        {event.date}
+                       </button>
                        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 relative z-10">{event.title}</h3>
                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">{event.description}</p>
                        <button onClick={() => onEventClick(event.title)} className="mt-2 text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline">Részletek &rarr;</button>

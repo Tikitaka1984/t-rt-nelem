@@ -227,7 +227,7 @@ const App: React.FC = () => {
       case 'essayGenerator':
         return <EssayGenerator onAddToJournal={handleSaveToJournal} />;
       case 'timeline':
-        return <TimelineView topic={content.data.topic} events={content.data.events} onEventClick={handleEventClick} onAddToJournal={handleSaveToJournal} />;
+        return <TimelineView topic={content.data.topic} events={content.data.events} onEventClick={handleEventClick} onAddToJournal={handleSaveToJournal} onDateClick={handleSearch} />;
       case 'eventDetail':
         return <EventDetailView key={content.data.id} eventDetail={content.data} onTermClick={handleSearch} onAddToJournal={handleAddToJournal} />;
       case 'comparison':
