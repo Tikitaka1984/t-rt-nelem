@@ -1,7 +1,6 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { Article, EventDetail, TimelineEvent, JournalEntry, ComparisonData } from './types';
-import { UserProgress } from './types/gamification';
 import { fetchConcept, fetchTimelineEvents, fetchEventDetail, fetchShortDefinition, fetchComparison } from './services/geminiService';
 import { SearchBar } from './components/SearchBar';
 import { ArticleView } from './components/ArticleView';
@@ -19,7 +18,6 @@ import { ComparisonView } from './components/ComparisonView';
 import { SunIcon } from './components/icons/SunIcon';
 import { MoonIcon } from './components/icons/MoonIcon';
 import { BookOpenIcon } from './components/icons/BookOpenIcon';
-import { GameHub } from './components/gamification/GameHub';
 
 type Content =
   | { type: 'initial' }
@@ -29,8 +27,7 @@ type Content =
   | { type: 'essayGenerator' }
   | { type: 'timeline', data: { topic: string, events: TimelineEvent[] } }
   | { type: 'eventDetail', data: EventDetail }
-  | { type: 'comparison', data: ComparisonData }
-  | { type: 'game' };
+  | { type: 'comparison', data: ComparisonData };
 
 
 const App: React.FC = () => {
@@ -44,14 +41,6 @@ const App: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
   const [isThemeRotating, setIsThemeRotating] = useState(false);
   
-  // Gamification State
-  const [userProgress, setUserProgress] = useState<UserProgress>({
-    totalPoints: 0,
-    completedQuestIds: [],
-    earnedBadgeIds: [],
-    detectiveStreak: 0,
-  });
-
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -125,10 +114,6 @@ const App: React.FC = () => {
     setContent({ type: 'essayGenerator' });
   }, []);
   
-  const handleShowGameHub = useCallback(() => {
-    setContent({ type: 'game' });
-  }, []);
-
   const handleGenerateTimeline = useCallback(async (topic: string) => {
     if (content.type === 'loading') return;
     setContent({ type: 'loading', message: 'Idővonal létrehozása...' });
@@ -212,19 +197,6 @@ const App: React.FC = () => {
     }
   };
   
-  const handleUpdateProgress = (newProgress: UserProgress) => {
-    // Add specific toast if points increased
-    if (newProgress.totalPoints > userProgress.totalPoints) {
-        const diff = newProgress.totalPoints - userProgress.totalPoints;
-        setToastMessage(`Gratulálunk! +${diff} pontot szereztél!`);
-    }
-    // Add toast for badge
-    if (newProgress.earnedBadgeIds.length > userProgress.earnedBadgeIds.length) {
-        setToastMessage("Új kitűzőt szereztél! Nézd meg a Játékzónában!");
-    }
-    setUserProgress(newProgress);
-  };
-
   const renderMainContent = () => {
     switch (content.type) {
       case 'initial':
@@ -260,15 +232,12 @@ const App: React.FC = () => {
         return <EventDetailView key={content.data.id} eventDetail={content.data} onTermClick={handleSearch} onAddToJournal={handleAddToJournal} />;
       case 'comparison':
         return <ComparisonView key={content.data.id} comparison={content.data} onAddToJournal={handleSaveToJournal} />;
-      case 'game':
-        return <GameHub userProgress={userProgress} onUpdateProgress={handleUpdateProgress} />;
     }
   };
   
   const sidePanelProps = {
       onSearch: handleSearch,
       onShowEssayGenerator: handleShowEssayGenerator,
-      onShowGameHub: handleShowGameHub,
       onGenerateTimeline: handleGenerateTimeline,
       onExport: handleExport,
       isActionDisabled: content.type === 'loading',
@@ -276,7 +245,6 @@ const App: React.FC = () => {
       onCompare: handleCompareConcepts,
       onToggleDarkMode: toggleDarkMode,
       isDarkMode: isDarkMode,
-      userPoints: userProgress.totalPoints,
   };
 
   return (
@@ -317,7 +285,7 @@ const App: React.FC = () => {
             onCancelCompare={() => setComparisonMode({ active: false, item1: '' })}
           />
           
-           {lastViewedConcept && !comparisonMode.active && content.type !== 'initial' && content.type !== 'game' && (
+           {lastViewedConcept && !comparisonMode.active && content.type !== 'initial' && (
             <div className="text-center mt-5 animate-fade-in">
               <button 
                 onClick={handleInitiateCompare}
