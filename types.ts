@@ -1,3 +1,4 @@
+
 export interface RelatedConcept {
   term: string;
   explanation: string;
@@ -10,10 +11,14 @@ export interface Article {
   relatedConcepts: RelatedConcept[];
 }
 
+export type EventCategory = 'politikai' | 'kulturalis' | 'gazdasagi' | 'katonai' | 'vallasi' | 'egyeb';
+
 export interface TimelineEvent {
   date: string;
   title: string;
   description: string;
+  category?: EventCategory;
+  importance?: number; // 1-10 skála
 }
 
 export interface Person {

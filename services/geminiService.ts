@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { Article, EventDetail, TimelineEvent, ComparisonData } from '../types';
 
@@ -57,9 +58,18 @@ const timelineResponseSchema = {
             description: {
                 type: Type.STRING,
                 description: "Az esemény jelentőségének rövid, 1-2 mondatos leírása."
+            },
+            category: {
+                type: Type.STRING,
+                description: "Az esemény kategóriája. Lehetséges értékek: 'politikai', 'kulturalis', 'gazdasagi', 'katonai', 'vallasi', 'egyeb'.",
+                enum: ['politikai', 'kulturalis', 'gazdasagi', 'katonai', 'vallasi', 'egyeb']
+            },
+            importance: {
+                type: Type.INTEGER,
+                description: "Az esemény történelmi súlya 1-től 10-ig terjedő skálán (10 a legfontosabb)."
             }
         },
-        required: ["date", "title", "description"]
+        required: ["date", "title", "description", "category", "importance"]
     }
 };
 
@@ -204,7 +214,13 @@ export const fetchTimelineEvents = async (topic: string): Promise<TimelineEvent[
     const systemInstruction = `
     Te egy történész mesterséges intelligencia vagy, aki magyar 12. évfolyamos diákok számára készít idővonalakat.
     A feladatod, hogy a megadott témáról készíts egy 8-12 kulcsfontosságú eseményből álló listát, szigorúan időrendi sorrendben.
-    Minden eseménynek tartalmaznia kell egy dátumot, egy rövid címet és egy 1-2 mondatos leírást a jelentőségéről.
+    Minden eseménynek tartalmaznia kell:
+    - Dátumot (date)
+    - Címet (title)
+    - Leírást (description)
+    - Kategóriát (category): politikai, kulturalis, gazdasagi, katonai, vallasi, egyeb
+    - Fontosságot (importance): 1-10 skála (ahol 10 a legfontosabb, korszakalkotó esemény)
+    
     A válaszodat a megadott JSON séma szerint add vissza. A teljes válasz magyar nyelven legyen.
   `;
 
@@ -251,7 +267,7 @@ export const fetchEventDetail = async (eventName: string): Promise<Omit<EventDet
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro', // Using a more powerful model for detailed analysis
+      model: 'gemini-2.5-pro', 
       contents: prompt,
       config: {
         systemInstruction,
