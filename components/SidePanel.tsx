@@ -4,12 +4,13 @@ import { TOPICS, TOP_CONCEPTS } from '../constants';
 import { AccordionItem } from './AccordionItem';
 import { DiceIcon } from './icons/DiceIcon';
 import { FeatherIcon } from './icons/FeatherIcon';
-import { TimelineIcon } from './icons/TimelineIcon';
+import { ArrowRightIcon } from './icons/ArrowRightIcon';
 import { ScaleIcon } from './icons/ScaleIcon';
 import { DownloadIcon } from './icons/DownloadIcon';
 
 export interface SidePanelProps {
   onSearch: (term: string) => void;
+  onRandomSearch: () => void;
   onShowEssayGenerator: () => void;
   onGenerateTimeline: (topic: string) => void;
   onExport: () => void;
@@ -31,6 +32,7 @@ const getTopicColorClass = (topic: string): string => {
 
 export const SidePanel: React.FC<SidePanelProps> = ({ 
     onSearch, 
+    onRandomSearch,
     onShowEssayGenerator, 
     onGenerateTimeline, 
     onExport, 
@@ -44,16 +46,20 @@ export const SidePanel: React.FC<SidePanelProps> = ({
   const [timelineTopic, setTimelineTopic] = useState<string>('');
   const [concept1, setConcept1] = useState<string>('');
   const [concept2, setConcept2] = useState<string>('');
+  const [isRandomLoading, setIsRandomLoading] = useState(false);
 
   const handleTopicClick = (topic: string) => {
     setActiveTopic(prev => (prev === topic ? null : topic));
   };
   
-  const handleRandomConcept = () => {
-    if (isActionDisabled) return;
-    const allConcepts = TOP_CONCEPTS.flatMap(group => group.concepts);
-    const randomConcept = allConcepts[Math.floor(Math.random() * allConcepts.length)];
-    onSearch(randomConcept);
+  const handleRandomConcept = async () => {
+    if (isActionDisabled || isRandomLoading) return;
+    setIsRandomLoading(true);
+    try {
+      await onRandomSearch();
+    } finally {
+      setIsRandomLoading(false);
+    }
   };
   
   const handleTimelineSubmit = (e: React.FormEvent) => {
@@ -198,7 +204,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({
                 type="text"
                 value={timelineTopic}
                 onChange={(e) => setTimelineTopic(e.target.value)}
-                placeholder="Idővonal témája..."
+                placeholder="pl. Mohácsi csata, Hunyadi Mátyás..."
                 disabled={isActionDisabled}
                 className="w-full pl-3 pr-10 py-2.5 text-sm bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
@@ -207,7 +213,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({
                 disabled={isActionDisabled || !timelineTopic.trim()}
                 className="absolute right-1 top-1 p-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-300 dark:disabled:bg-slate-600"
               >
-                <TimelineIcon className="w-4 h-4" />
+                <ArrowRightIcon className="w-4 h-4" />
               </button>
             </form>
             
@@ -223,25 +229,34 @@ export const SidePanel: React.FC<SidePanelProps> = ({
                 
                  <button 
                     onClick={handleRandomConcept} 
-                    disabled={isActionDisabled} 
-                    className="flex flex-col items-center justify-center p-3 bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/30 rounded-xl hover:shadow-md hover:-translate-y-0.5 transition-all group"
+                    disabled={isActionDisabled || isRandomLoading} 
+                    className="flex flex-col items-center justify-center p-3 bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/30 rounded-xl hover:shadow-md hover:-translate-y-0.5 transition-all group disabled:opacity-50"
                 >
-                    <DiceIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400 mb-1 group-hover:rotate-180 transition-transform duration-500" />
+                    {isRandomLoading ? (
+                        <div className="w-6 h-6 border-2 border-indigo-600 dark:border-indigo-400 border-t-transparent rounded-full animate-spin mb-1"></div>
+                    ) : (
+                        <DiceIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400 mb-1 group-hover:rotate-180 transition-transform duration-500" />
+                    )}
                     <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">Random</span>
                 </button>
             </div>
             
-            <button 
-                onClick={onExport} 
-                disabled={isExportDisabled} 
-                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
-                    isExportDisabled 
-                    ? 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'
-                    : 'bg-gray-800 dark:bg-slate-700 text-white hover:bg-gray-900 dark:hover:bg-slate-600 shadow-md hover:shadow-lg'
-                }`}
-            >
-                 <DownloadIcon className="w-5 h-5" /> Exportálás
-            </button>
+            <div className="space-y-2">
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 text-center italic">
+                A fogalomnaplót szövegfájlként (.txt) tölti le.
+              </p>
+              <button 
+                  onClick={onExport} 
+                  disabled={isExportDisabled} 
+                  className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
+                      isExportDisabled 
+                      ? 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-50'
+                      : 'bg-gray-800 dark:bg-slate-700 text-white hover:bg-gray-900 dark:hover:bg-slate-600 shadow-md hover:shadow-lg'
+                  }`}
+              >
+                   <DownloadIcon className="w-5 h-5" /> Exportálás
+              </button>
+            </div>
           </div>
       </section>
     </div>

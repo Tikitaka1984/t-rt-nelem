@@ -72,7 +72,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({ article, onTermClick, 
                   <li key={concept.term} className="group">
                     <button
                       onClick={() => onTermClick(concept.term)}
-                      className="text-base font-bold text-blue-700 dark:text-blue-400 group-hover:text-blue-800 dark:group-hover:text-blue-300 flex items-center gap-2 transition-colors"
+                      className="text-base font-bold text-blue-700 dark:text-blue-400 group-hover:text-blue-800 dark:group-hover:text-blue-300 hover:underline decoration-2 underline-offset-2 flex items-center gap-2 transition-all"
                     >
                       <span className="w-1.5 h-1.5 bg-blue-400 rounded-full group-hover:scale-150 transition-transform"></span>
                       {concept.term}

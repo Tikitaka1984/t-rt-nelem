@@ -1,5 +1,6 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
+import { TOP_CONCEPTS } from './constants';
 import { Article, EventDetail, TimelineEvent, JournalEntry, ComparisonData } from './types';
 import { fetchConcept, fetchTimelineEvents, fetchEventDetail, fetchShortDefinition, fetchComparison } from './services/geminiService';
 import { SearchBar } from './components/SearchBar';
@@ -24,7 +25,7 @@ type Content =
   | { type: 'loading', message: string }
   | { type: 'error', message: string }
   | { type: 'article', data: Article }
-  | { type: 'essayGenerator' }
+  | { type: 'essayGenerator', topic?: string }
   | { type: 'timeline', data: { topic: string, events: TimelineEvent[] } }
   | { type: 'eventDetail', data: EventDetail }
   | { type: 'comparison', data: ComparisonData };
@@ -59,13 +60,16 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (toastMessage) {
-      const timer = setTimeout(() => setToastMessage(null), 3000);
+      const timer = setTimeout(() => setToastMessage(null), 2000);
       return () => clearTimeout(timer);
     }
   }, [toastMessage]);
   
   const handleCompareConcepts = useCallback(async (concept1: string, concept2: string) => {
     if (content.type === 'loading') return;
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
     setContent({ type: 'loading', message: 'Összehasonlítás készítése...' });
     try {
         const result = await fetchComparison(concept1, concept2);
@@ -86,6 +90,9 @@ const App: React.FC = () => {
   const handleSearch = useCallback(async (term: string) => {
     if (content.type === 'loading') return;
     
+    // Scroll to top on search to give feedback on navigation
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     if (comparisonMode.active) {
         await handleCompareConcepts(comparisonMode.item1, term);
         return;
@@ -111,11 +118,15 @@ const App: React.FC = () => {
   }, [content, comparisonMode, handleCompareConcepts]);
   
   const handleShowEssayGenerator = useCallback(() => {
-    setContent({ type: 'essayGenerator' });
-  }, []);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setContent({ type: 'essayGenerator', topic: lastViewedConcept?.title });
+  }, [lastViewedConcept]);
   
   const handleGenerateTimeline = useCallback(async (topic: string) => {
     if (content.type === 'loading') return;
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
     setContent({ type: 'loading', message: 'Idővonal létrehozása...' });
      try {
       const result = await fetchTimelineEvents(topic);
@@ -129,6 +140,8 @@ const App: React.FC = () => {
 
   const handleEventClick = useCallback(async (eventName: string) => {
     if (content.type === 'loading') return;
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     
     if (content.type === 'eventDetail' && content.data.title.toLowerCase() === eventName.toLowerCase()) {
         return;
@@ -196,6 +209,15 @@ const App: React.FC = () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
+
+  const handleRandomSearch = useCallback(async () => {
+    if (content.type === 'loading') return;
+    const allConcepts = TOP_CONCEPTS.flatMap(group => group.concepts);
+    const randomConcept = allConcepts[Math.floor(Math.random() * allConcepts.length)];
+    
+    await handleSearch(randomConcept);
+    setToastMessage(`Véletlenszerű fogalom: ${randomConcept}`);
+  }, [content.type, handleSearch]);
   
   const renderMainContent = () => {
     switch (content.type) {
@@ -225,7 +247,7 @@ const App: React.FC = () => {
       case 'article':
         return <ArticleView key={content.data.id} article={content.data} onTermClick={handleSearch} onAddToJournal={handleAddToJournal} />;
       case 'essayGenerator':
-        return <EssayGenerator onAddToJournal={handleSaveToJournal} />;
+        return <EssayGenerator initialTopic={content.topic} onAddToJournal={handleSaveToJournal} />;
       case 'timeline':
         return <TimelineView topic={content.data.topic} events={content.data.events} onEventClick={handleEventClick} onAddToJournal={handleSaveToJournal} onDateClick={handleSearch} />;
       case 'eventDetail':
@@ -237,11 +259,12 @@ const App: React.FC = () => {
   
   const sidePanelProps = {
       onSearch: handleSearch,
+      onRandomSearch: handleRandomSearch,
       onShowEssayGenerator: handleShowEssayGenerator,
       onGenerateTimeline: handleGenerateTimeline,
       onExport: handleExport,
       isActionDisabled: content.type === 'loading',
-      isExportDisabled: !['article', 'timeline', 'comparison'].includes(content.type),
+      isExportDisabled: journal.length === 0,
       onCompare: handleCompareConcepts,
       onToggleDarkMode: toggleDarkMode,
       isDarkMode: isDarkMode,
@@ -303,12 +326,12 @@ const App: React.FC = () => {
       <div className="flex-grow overflow-y-auto custom-scrollbar">
         <div className="max-w-7xl mx-auto px-4 py-8">
 
-          <section className="lg:grid lg:grid-cols-[1fr,320px] xl:grid-cols-[1fr,360px] lg:gap-8">
-            <main className="lg:col-span-1 mb-8 lg:mb-0 min-h-[400px]">
+          <section className="md:grid md:grid-cols-[1fr,320px] xl:grid-cols-[1fr,360px] md:gap-8">
+            <main className="md:col-span-1 mb-8 md:mb-0 min-h-[400px]">
               {renderMainContent()}
             </main>
 
-            <aside className="hidden lg:block lg:col-span-1">
+            <aside className="hidden md:block md:col-span-1">
               <div className="sticky top-8">
                 <div className="bg-white dark:bg-slate-900/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden">
                   <SidePanel {...sidePanelProps} />
@@ -317,10 +340,6 @@ const App: React.FC = () => {
             </aside>
           </section>
           
-          <section className="lg:hidden mt-8">
-             <MobileSidebar {...sidePanelProps} />
-          </section>
-
         </div>
       </div>
       
@@ -340,6 +359,8 @@ const App: React.FC = () => {
           </span>
         )}
       </button>
+
+      <MobileSidebar {...sidePanelProps} />
 
       {isExportModalOpen && (content.type === 'article' || content.type === 'timeline' || content.type === 'comparison') && (
         <ExportModal content={content.data} type={content.type} onClose={() => setExportModalOpen(false)} />

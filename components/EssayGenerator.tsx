@@ -1,20 +1,28 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { generateEssay } from "../services/essayService";
 import { BookPlusIcon } from "./icons/BookPlusIcon";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 interface EssayGeneratorProps {
+    initialTopic?: string;
     onAddToJournal: (term: string, definition: string) => void;
 }
 
-export default function EssayGenerator({ onAddToJournal }: EssayGeneratorProps) {
-  const [topic, setTopic] = useState("");
+export default function EssayGenerator({ initialTopic, onAddToJournal }: EssayGeneratorProps) {
+  const [topic, setTopic] = useState(initialTopic || "");
   const [level, setLevel] = useState("kozep");
   const [style, setStyle] = useState("tomor");
   const [mode, setMode] = useState("vazlat"); 
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+
+  useEffect(() => {
+    if (initialTopic) {
+      setTopic(initialTopic);
+    }
+  }, [initialTopic]);
 
   const handleGenerate = async () => {
     if (!topic.trim()) return;
@@ -101,16 +109,25 @@ export default function EssayGenerator({ onAddToJournal }: EssayGeneratorProps) 
       </div>
 
       {/* Gomb */}
-      <button
-        onClick={handleGenerate}
-        disabled={loading || !topic.trim()}
-        className="w-full px-6 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 dark:bg-[#16c784] dark:hover:bg-green-500 transition font-semibold text-white disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
-      >
-        {loading ? "Generálás..." : "Esszé készítése"}
-      </button>
+      {!loading && (
+        <button
+          onClick={handleGenerate}
+          disabled={!topic.trim()}
+          className="w-full px-6 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 dark:bg-[#16c784] dark:hover:bg-green-500 transition font-semibold text-white disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
+        >
+          Esszé készítése
+        </button>
+      )}
+
+      {/* Loading Spinner */}
+      {loading && (
+        <div className="py-12 bg-gray-50 dark:bg-slate-800/30 rounded-2xl border border-dashed border-gray-300 dark:border-slate-700 animate-pulse">
+          <LoadingSpinner message="Az AI éppen fogalmazza az esszét. Kérjük, várjon egy pillanatot..." />
+        </div>
+      )}
 
       {/* Eredmény */}
-      {result && (
+      {result && !loading && (
         <div className="mt-6 p-6 bg-gray-100 dark:bg-[#1a1a2e]/50 rounded-2xl whitespace-pre-line">
           <h3 className="text-xl font-bold mb-4 border-b pb-2 dark:border-[#2a2a4e]">Generált eredmény:</h3>
           <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none mb-8">
